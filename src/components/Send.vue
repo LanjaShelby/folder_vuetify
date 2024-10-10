@@ -1,7 +1,12 @@
 <template>
-    <v-app id="inspire">
-   
-       <v-main>          
+ 
+    <v-container
+        class="py-8 px-6"
+        fluid
+        back
+      >    
+     
+                
   <v-row justify="center">
     <v-col
       cols="12"
@@ -22,18 +27,21 @@
             :rules="[() => !!Objet || 'This field is required']"
             required
           ></v-text-field>
-          <v-select 
-            ref="Destinataire"
-            v-model="Destinataire"
-            :item-props="DestinataireProps"  
-            :items="Destinataires" 
-            :rules="[() => !!Destinataire || 'This field is required']"
-            label="Destinataire"
-            placeholder="Select..."
-            prepend-icon="mdi-card-account-mail"
-            hint="Destinataire du message"
-            required>
-          </v-select>
+          <v-select
+              v-model="select"
+              :hint="`${select.text}, ${select.value}`"
+              :items="userOptions"
+              item-title="text"
+              item-value="value"
+            
+              label="Destinataire"
+              placeholder="Select..."
+              prepend-icon="mdi-card-account-mail"
+              persistent-hint
+              return-object
+              single-line  
+              required 
+           ></v-select>
     
           <v-textarea
           ref="message"
@@ -116,10 +124,9 @@
       </v-card>
     </v-col>
   </v-row>
-
-
-       </v-main>
-     </v-app>
+ </v-container>   
+ 
+     
    </template>
    
    
@@ -128,60 +135,82 @@
   // const errorMessages = "";
      const cards = ['Today', 'Yesterday']
      const links = [
-       ['mdi-inbox-arrow-down', 'Inbox'],
-       ['mdi-send', 'Send'],
-       ['mdi-delete', 'Trash'],
-       ['mdi-alert-octagon', 'Spam'],
-     ]
+    ['mdi-inbox-arrow-down', 'Inbox' ,'/'],
+    ['mdi-send', 'Send' , '/send'],
+    ['mdi-timeline-text-outline', 'History' ,'/history'],
+   
+  ]
    
      const drawer = ref(null)
    </script>
    
    <script>
+    import axios from '../plugins/axios' 
      export default {
        data: () => ({
+        select:"",
          cards: ['Today', 'Yesterday'],
          drawer: null,
+         dialog:false,
          links: [
            ['mdi-inbox-arrow-down', 'Inbox'],
            ['mdi-send', 'Send'],
            ['mdi-delete', 'Trash'],
            ['mdi-alert-octagon', 'Spam'],
          ],
-         Destinataires: [{
-          name: 'John',
-          department: 'Marketing',
-        },
-        {
-          name: 'Jane',
-          department: 'Engineering',
-        },],
-
+        
+        Destinatairess:null,
           Destinataire:null,
           Objet:null,
           files: [],
           message:null,
           errorMessages: '',
           formHasErrors: false,
+          selectedUser:"",
+          userOptions: [],
+           Messages:[],
+           UserConnectedId:null,
+           Sender:null,
        }),
        computed: {
           form () {
             return {
-            
-              Destinataire:this.Destinataire,
+              sender:this.UserConnectedId,
+              recipient: String(this.select.value) ,
               message: this.message,
-              Objet: this.Objet,
+              title: this.Objet,
               files:this.files
             }
             },
           
           },
+        
+      mounted(){
+            this.UserConnectedId = localStorage.getItem("user-info-id")
+            this.GetUser();
+
+          },
 
        methods: {
+
+        async GetUser(){
+        const response = await axios.get('/userss');
+        this.Destinatairesss = response.data['hydra:member'];
+      
+        this.userOptions = this.Destinatairesss
+        .filter(user => Number(user.id ) !== Number(this.UserConnectedId))
+        .map(user => ({
+            value: user.id,  // Ce qui sera retourné comme valeur
+            text: user.name // Ce qui sera affiché dans le select
+          }));
+          console.log("Options filtrées:", this.userOptions);
+          console.log("Type de l'ID connecté:", typeof this.UserConnected);
+       },
+
            DestinataireProps (User) {
             return {
-              title: User.name,
-              subtitle: User.department,
+              name: User.name,
+              id: User.id,
             }},
           messageCheck () {
             this.errorMessages = !this.message
@@ -197,16 +226,81 @@
               this.$ref[f].reset()
         })
           },
-          submit () {
-            this.formHasErrors = false
+          async submit () {
+            try
+           { this.formHasErrors = false
+            for (let f in this.form) {
+                    if (!this.form[f]) {
+                      this.errorMessages = "Formulaire error";
+                      this.formHasErrors = true;
+                      break; 
+                    }
+                  }                 
+            if (this.formHasErrors) {
+              return; // stoppe l'exécution de la fonction
+            }
+         
+            const formData = new FormData();
+            formData.append('sender', this.UserConnectedId);
+            formData.append('recipient', String(this.select.value));
+            formData.append('message', this.message);
+            formData.append('title', this.Objet);
+              this.files.forEach((file, index) => {
+                formData.append(`files[${index}]`, file);  // 'files' est le champ attendu côté serveur
+              });
+            
+            const resoponse = await axios.post("/sendmessage" ,formData)
+            .then((response) => {
+                // Gérer la réponse de succès
+                console.log('Success:', response.data);
+              })
+              .catch((error) => {
+                // Gérer l'erreur
+                if (error.response) {
+                  console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                } else {
+                  console.error('Erreur lors de l\'envoi:', error.message);
+                }  });
 
-            Object.keys(this.form).forEach(f => {
-              if (!this.form[f])  this.errorMessages = "Formulaire error"
+      
+         
+                
 
-              console.log(this.form);
-              console.log(this.errorMessages);
-            })
+                
+          } catch (error) {
+              if (error.response) {
+                  // Le serveur a répondu avec un code d'erreur (ex: 400, 500)
+                  console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                } else if (error.request) {
+                  // La requête a été envoyée mais aucune réponse n'a été reçue
+                  console.error('Erreur lors de l\'envoi - Aucune réponse reçue :', error.request);
+                } else {
+                  // Quelque chose d'autre a provoqué l'erreur
+                  console.error('Erreur lors de l\'envoi', error.message);
+                }
+            }
+           
           },
         },
      }
+       /*Object.keys(this.form).forEach(f => {
+              if (!this.form[f])  this.errorMessages = "Formulaire error"
+              this.formHasErrors = true
+       
+            })*/
      </script>
+     <style >
+     .slide-left-enter-active, .slide-left-leave-active {
+       transition: transform 0.5s ease;
+     }
+     
+     .slide-left-enter, .slide-left-leave-to {
+       /* Commence la transition de la gauche à droite */
+       transform: translateX(-100%);
+     }
+     
+     .slide-left-leave, .slide-left-enter-to {
+       /* Termine la transition sur la droite */
+       transform: translateX(100%);
+     }
+     </style>

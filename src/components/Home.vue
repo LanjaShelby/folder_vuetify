@@ -1,25 +1,12 @@
 <template>
   <v-app id="inspire">
-   <!-- <v-system-bar>
-     
-      <v-icon>mdi-square</v-icon>
-
-      <v-icon>mdi-circle</v-icon>
-
-      <v-icon>mdi-check-circle-outline"</v-icon>
-      
-      <v-icon>mdi-triangle</v-icon>
-    </v-system-bar> -->
-
     <v-navigation-drawer 
     v-model="drawer"
     color="#1569C7">
-    
       <v-sheet
         class="pa-4"
         color="#1569C7"
-        style="cursor: pointer"
-       
+        style="cursor: pointer"  
       >
       <div
       @click="dialog = !dialog">
@@ -29,10 +16,9 @@
           size="64"
         ></v-avatar>
 
-        <div>john@google.com</div>
+        <div>{{UserConnected.name}}</div>
       </div>
       
-
     <v-fade-transition hide-on-leave>
       <v-card
         v-if=dialog
@@ -75,11 +61,9 @@
       </v-card>
     </v-fade-transition>
        
-
       </v-sheet>
 
       <v-divider></v-divider>
-    
       <v-list>
         <v-list-item
           v-for="[icon, text, route] in links"
@@ -89,13 +73,19 @@
           :to="route"
           link
         ></v-list-item>
-      <!--  <v-list-item prepend-icon="mdi-email" title="Inbox" link to="/inbox" > </v-list-item>
-       <v-list-item prepend-icon="mdi-send" title="Send" link to="/send"></v-list-item>
-       <v-list-item prepend-icon="mdi-timeline-text-outline" title="History" link to="/history"></v-list-item>
-       <v-list-item prepend-icon="mdi-alert-octagon" title="Spam" link ></v-list-item> -->
+        <div class="pa-4 text-end">
+          <v-btn
+            class="text-none"
+            color="medium-emphasis"
+            min-width="92"
+            variant="outlined"
+            rounded
+            @click="Logout"
+          >
+            Logout
+          </v-btn>
+        </div>
       </v-list>
-  
-
     </v-navigation-drawer>
 
     <v-main 
@@ -108,10 +98,116 @@
       <transition name="slide-left">
       <router-view  :key="$route.fullPath" />
     </transition>
-    </v-container>
- 
+    </v-container>   
+    </v-main>
+  </v-app>
+</template>
+
+<script setup>
+  import { ref } from 'vue';
+
+  const cards = ['Today', 'Yesterday']
+  const links = [
+    ['mdi-inbox-arrow-down', 'Inbox' ,'/inbox'],
+    ['mdi-send', 'Send' , '/send'],
+    ['mdi-timeline-text-outline', 'History' ,'/history'],
    
-     <!-- <v-container
+  ]
+
+  const drawer = ref(null)
+  //const dialog = ref(false) 
+</script>
+
+<script>
+   import axios from '../plugins/axios' 
+  export default {
+    data: () => ({
+      previousRoute: '',
+      drawer: null,
+      dialog:false,
+      UserConnected:[],
+    }),
+    created(){
+      this.GetUserConnected();
+    },
+    mounted(){
+        
+       },
+    methods: {
+      async GetUserConnected(){
+          try{
+              
+                  const response = await axios.get('/userme');
+                  console.log('Données recu avec succès', response.data);
+                   this.UserConnected = response.data;               
+                   localStorage.setItem("user-info", this.UserConnected.name );  
+                   localStorage.setItem("user-info-id", this.UserConnected.id );  
+            }catch (error) {
+              if (error.response) {
+                  // Le serveur a répondu avec un code d'erreur (ex: 400, 500)
+                  console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                } else if (error.request) {
+                  // La requête a été envoyée mais aucune réponse n'a été reçue
+                  console.error('Erreur lors de l\'envoi - Aucune réponse reçue :', error.request);
+                } else {
+                  // Quelque chose d'autre a provoqué l'erreur
+                  console.error('Erreur lors de l\'envoi', error.message);
+                }
+            }
+    },
+        async Logout(){
+          try{
+            const response = await axios.post('/logout')
+            localStorage.clear()
+            this.$router.push({name:"login"})
+          }catch (error) {
+              if (error.response) {
+                  // Le serveur a répondu avec un code d'erreur (ex: 400, 500)
+                  console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                } else if (error.request) {
+                  // La requête a été envoyée mais aucune réponse n'a été reçue
+                  console.error('Erreur lors de l\'envoi - Aucune réponse reçue :', error.request);
+                } else {
+                  // Quelque chose d'autre a provoqué l'erreur
+                  console.error('Erreur lors de l\'envoi', error.message);
+                }
+            }
+         
+
+            },
+    }
+   
+};
+  
+</script>
+<style >
+.slide-left-enter-active, .slide-left-leave-active {
+  transition: transform 0.5s ease;
+}
+
+.slide-left-enter, .slide-left-leave-to {
+  /* Commence la transition de la gauche à droite */
+  transform: translateX(-100%);
+}
+
+.slide-left-leave, .slide-left-enter-to {
+  /* Termine la transition sur la droite */
+  transform: translateX(100%);
+}
+</style>
+
+ <!-- <v-system-bar>
+     
+      <v-icon>mdi-square</v-icon>
+
+      <v-icon>mdi-circle</v-icon>
+
+      <v-icon>mdi-check-circle-outline"</v-icon>
+      
+      <v-icon>mdi-triangle</v-icon>
+    </v-system-bar> -->
+      <!-- <v-container
+       <!-- <v-container
         class="py-8 px-6"
         fluid
         back
@@ -153,64 +249,3 @@
           </v-col>
         </v-row>
       </v-container> è-->
-    </v-main>
-  </v-app>
-</template>
-
-<script setup>
-  import { ref } from 'vue';
-
-  const cards = ['Today', 'Yesterday']
-  const links = [
-    ['mdi-inbox-arrow-down', 'Inbox' ,'/'],
-    ['mdi-send', 'Send' , '/send'],
-    ['mdi-timeline-text-outline', 'History' ,'/history'],
-   
-  ]
-
-  const drawer = ref(null)
-  //const dialog = ref(false) 
-</script>
-
-<script>
-  export default {
-    data: () => ({
-      previousRoute: '',
-      drawer: null,
-      links: [
-        ['mdi-inbox-arrow-down', 'Inbox'],
-        ['mdi-send', 'Send'],
-        ['mdi-delete', 'Trash'],
-        ['mdi-alert-octagon', 'Spam'],
-      ],
-      dialog:false,
- 
-    }),
-    computed: {
-    slideDirection() {
-      return this.$router.history.current.fullPath > this.previousRoute ? 'slide-left' : 'slide-right';
-    },
-  },
-  watch: {
-    $route(to, from) {
-      this.previousRoute = from.fullPath;
-    }
-  }
-};
-  
-</script>
-<style >
-.slide-left-enter-active, .slide-left-leave-active {
-  transition: transform 0.5s ease;
-}
-
-.slide-left-enter, .slide-left-leave-to {
-  /* Commence la transition de la gauche à droite */
-  transform: translateX(-100%);
-}
-
-.slide-left-leave, .slide-left-enter-to {
-  /* Termine la transition sur la droite */
-  transform: translateX(100%);
-}
-</style>
