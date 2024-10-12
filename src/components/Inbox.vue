@@ -18,16 +18,23 @@
                   <template v-for="Message in todayMessages" :key="Message" ">
 
                     <v-list-item
+                    @click="openDialog(Message)"
                     style="background-color:#F5F5F5;">
                       <template v-slot:prepend>
-                        <v-avatar color="grey-darken-1"></v-avatar>
+                        <v-avatar size="x-large" > <v-icon icon="mdi-account-circle"></v-icon></v-avatar>
                       </template>
-                         <h1>  {{Message.sender.name}} </h1>
-                         <p>
-                      Content of Message : {{Message.message}}          
-                         </p> 
+                         <p class="font-weight-medium">
+                          {{Message.sender.name}} @ <span class="font-weight-light"> {{Message.created_at.split(' ')[1]}} </span>
+                           </p>
+                     
+                         <h1 class="text-overline">
+                         Subject: {{Message.title}}
+                          </h1>
                          
-                        <v-chip-group
+                         <v-chip color="secondary" variant="flat">
+                      {{Message.files.length}} Files
+                          </v-chip>
+                         <!--   <v-chip-group
                             variant="flat"
                             mandatory
                           >
@@ -40,6 +47,101 @@
                             </v-chip>
                          </v-chip-group>
 
+                        CONTENT MESSAGE -->
+                        <v-dialog
+                               v-model="isDialogOpen"
+                                      transition="dialog-bottom-transition" 
+                                      width='100vh' 
+                                      class="justify-center"                             
+                                    >
+    
+                                    
+                                          <v-card
+                                          class="mx-auto"
+                                          color="#FFFFFF00"
+                                          max-width="650"
+                                          min-height="350"
+                                          theme="dark"
+                                          variant="flat"
+                                        >
+                                          <v-sheet color="#C77416">
+                                            <v-card-item>
+                                              <template v-slot:prepend>
+                                                <v-card-title>
+                                                  <v-avatar >
+                                                    <v-icon icon="mdi-account-circle"></v-icon>
+                                                  </v-avatar>
+
+                                                 {{clickMessage.sender.name}}
+                                                </v-card-title>
+                                              </template>
+
+                                              <v-divider class="mx-2" vertical></v-divider>                                      
+                                              <template v-slot:append>
+                                                <v-btn
+                                                  icon="$close"
+                                                  size="large"
+                                                  variant="text"
+                                                   @click ="isDialogOpen = false"
+                                                ></v-btn>
+                                              </template>
+                                            </v-card-item>
+                                          </v-sheet>
+
+                                          <v-card
+                                            class="ma-4"
+                                            color="#2f3136"
+                                            rounded="lg"
+                                            variant="flat"
+                                          >
+                                            <v-card-item>
+                                              <v-card-title class="text-body-2 d-flex align-center">
+                                                <v-icon
+                                                  color="#949cf7"
+                                                  icon="mdi-calendar"
+                                                  start
+                                                ></v-icon>
+
+                                                <span class="text-medium-emphasis font-weight-bold">{{clickMessage.created_at.split(' ')[0]}} -{{clickMessage.created_at.split(' ')[1]}}</span>
+
+                                                <v-spacer></v-spacer>
+
+                                              
+
+                                               
+                                              </v-card-title>
+
+                                              <div class="py-2">
+                                                <div class="text-h6">{{clickMessage.title}}:</div>
+
+                                                <div class="font-weight-light text-medium-emphasis">
+                                                  {{clickMessage.message}}
+                                                </div>
+                                              </div>
+                                            </v-card-item>
+
+                                            <v-divider></v-divider>
+
+                                            <div class="pa-4 d-flex align-center">
+                                              <div class="text-h6">Files:</div>
+                                              <v-chip-group
+                                                variant="flat"
+                                               column
+                                              class="pa-2"
+                                              >
+                                                <v-chip 
+                                                v-for='file in this.clickMessage.files ' :key="file"
+                                                v-model="this.clickMessage.files"
+                                                  class="me-2"
+                                                  color="deep-purple-accent-4"
+                                                  size="small"
+                                                  label> {{ file.path}}
+                                                </v-chip>
+                                            </v-chip-group>
+                                            </div>
+                                          </v-card>
+                                        </v-card>
+                          </v-dialog>
 
 
               
@@ -81,7 +183,7 @@
                                         <div class="mb-2">Statut</div>
                                         <div class="text-medium-emphasis mb-4">
                                           <v-select 
-                                                ref="Destinataire"
+                                                ref="Statut"
                                                 v-model="Statut"
                                                 :item-props="statut"  
                                                 :items="statut" 
@@ -106,10 +208,10 @@
                                               counter="325"
                                               required
                                               placeholder="Votre message"
-                                              v-model="clickMessage.message"
+                                              v-model="this.message"
                                               :rules="[
-                                              () => !!clickMessage.message || 'This field is required',
-                                              () => !!clickMessage.message && clickMessage.message.length <= 325 || 'Message must be less than 325 characters',
+                                              () => !!this.message || 'This field is required',
+                                              () => !!this.message && this.message.length <= 325 || 'Message must be less than 325 characters',
                                                       messageCheck
                                                   ]"
                                           ></v-textarea>
@@ -323,6 +425,7 @@
                         <v-chip-group
                             variant="flat"
                             mandatory
+                            multiple
                           >
                              <v-chip 
                              v-for='file in Message.files ' :key="file"
@@ -341,26 +444,121 @@
                                       width='100vh' 
                                       class="justify-center"                             
                                     >
-                                    <v-card
+    
+                                    
+                                          <v-card
+                                          class="mx-auto"
+                                          color="#FFFFFF00"
+                                          max-width="650"
+                                          min-height="350"
+                                          theme="dark"
+                                          variant="flat"
+                                        >
+                                          <v-sheet color="#66BB6A">
+                                            <v-card-item>
+                                              <template v-slot:prepend>
+                                                <v-card-title>
+                                                  <v-avatar color="grey-darken-1"></v-avatar>
+
+                                                 {{clickMessage.sender.name}}
+                                                </v-card-title>
+                                              </template>
+
+                                              <v-divider class="mx-2" vertical></v-divider>                                      
+                                              <template v-slot:append>
+                                                <v-btn
+                                                  icon="$close"
+                                                  size="large"
+                                                  variant="text"
+                                                   @click ="isDialogOpen = false"
+                                                ></v-btn>
+                                              </template>
+                                            </v-card-item>
+                                          </v-sheet>
+
+                                          <v-card
+                                            class="ma-4"
+                                            color="#2f3136"
+                                            rounded="lg"
+                                            variant="flat"
+                                          >
+                                            <v-card-item>
+                                              <v-card-title class="text-body-2 d-flex align-center">
+                                                <v-icon
+                                                  color="#949cf7"
+                                                  icon="mdi-calendar"
+                                                  start
+                                                ></v-icon>
+
+                                                <span class="text-medium-emphasis font-weight-bold">{{clickMessage.created_at.split(' ')[0]}} -{{clickMessage.created_at.split(' ')[1]}}</span>
+
+                                                <v-spacer></v-spacer>
+
+                                              
+
+                                               
+                                              </v-card-title>
+
+                                              <div class="py-2">
+                                                <div class="text-h6">{{clickMessage.title}}:</div>
+
+                                                <div class="font-weight-light text-medium-emphasis">
+                                                  {{clickMessage.message}}
+                                                </div>
+                                              </div>
+                                            </v-card-item>
+
+                                            <v-divider></v-divider>
+
+                                            <div class="pa-4 d-flex align-center">
+                                              <div class="text-h6">Files:</div>
+                                              <v-chip-group
+                                                variant="flat"
+                                               column
+                                              class="pa-2"
+                                              >
+                                                <v-chip 
+                                                v-for='file in this.clickMessage.files ' :key="file"
+                                                v-model="this.clickMessage.files"
+                                                  class="me-2"
+                                                  color="deep-purple-accent-4"
+                                                  size="small"
+                                                  label> {{ file.path}}
+                                                </v-chip>
+                                            </v-chip-group>
+                                            </div>
+                                          </v-card>
+                                        </v-card>
+
+                                 <!--       <v-card
                                           class="mx-auto text-white"
-                                          color= "#9E9E9E"
+                                          color= "#42A5F5"
                                           width='100vh'  
                                           prepend-icon="mdi-calendar"
                                           :title= "clickMessage.created_at"
                                         >
-                                       <template v-slot:prepend>
+                                        <v-divider
+                                          
+                                        ></v-divider>
+                                        <template v-slot:prepend>
                                             <v-icon size="x-large"></v-icon>
                                        </template>
-
-                                       <v-card-subtitle class=" pl-10" >
-                                         Subject : {{clickMessage.title}}
+                                      <div class="d-flex " >
+                                       <v-card-subtitle class="text-h5 pl-10  text-decoration-underline" >
+                                         Subject :
                                          </v-card-subtitle>
-                                         
-                                       <v-card-text class="text-h5 py-2 pa-10">
+                                         <v-card-text class="text-h6 py-2 pa-10 ">
+                                          {{clickMessage.title}}
+                                      </v-card-text >
+                                    </div>
+                                         <v-card-subtitle class=" text-h5  pl-10 text-decoration-underline" >
+                                         Content :
+                                         </v-card-subtitle>
+                                       <v-card-text class="text-h6 py-2 pa-10 ">
                                             " {{clickMessage.message}} "
                                       </v-card-text >
 
-                                      <v-card-subtitle class=" pl-10" >
+                                      <v-card-subtitle class="text-h5 pl-10  text-decoration-underline" >
                                          File :
                                          </v-card-subtitle>
                                          <v-chip-group
@@ -374,7 +572,7 @@
                                                   class="me-2"
                                                   color="deep-purple-accent-4"
                                                   size="small"
-                                                  label> Filename: {{ file.path}}
+                                                  label> {{ file.path}}
                                                 </v-chip>
                                             </v-chip-group>
                                       <v-card-actions class=" pa-10">
@@ -399,7 +597,7 @@
                                         </v-card-actions>
                                    </v-card>
                                  
-                               <!--       <v-card>
+                                  <v-card>
                                         <v-toolbar color="success" >  
                                           <v-toolbar-title> {{clickMessage.sender.name}} </v-toolbar-title>                                                                                                    
                                           <v-icon
@@ -464,8 +662,8 @@
                                       <v-btn
                                           icon="mdi-close"
                                           variant="text"
-                                          @click="isActive.value = false"
-                                        ></v-btn>
+                                          @click="isActive.value = false" ></v-btn>
+                                   
                                       </v-card-title>
   
                                       <v-divider class="mb-4"></v-divider>
@@ -800,13 +998,12 @@
             value: user.id,  // Ce qui sera retourné comme valeur
             text: user.name // Ce qui sera affiché dans le select
           }));
-      
-         
+  
        },
        openDialog(Message) {
       this.clickMessage= Message; // Définit l'élément sélectionné
       this.isDialogOpen = true; // Ouvre la boîte de dialogue
-      console.log("cliked" ,this.isDialogOpen)
+     
     },
        SelectMessage(Message){
             this.clickMessage= Message;

@@ -16,6 +16,7 @@ import Send from "../components/Send.vue"
 import Register from "../components/Register.vue"
 import Home from "../components/Home.vue"
 import HomeLogin from "../components/HomeLogin.vue"
+import User from "../components/User.vue"
 
 //import { routes } from 'vue-router/auto-routes'
 
@@ -31,6 +32,7 @@ const router = createRouter({
             { path: 'send',name: "send", component:() => import('@/components/Send.vue') },
             { path: 'inbox',name: "inbox", component: () => import('@/components/Inbox.vue') },
             { path: 'history',name: "history", component: () => import('@/components/History.vue') },
+            { path: 'user',name: "user", component: () => import('@/components/User.vue') },
           ],
         },
         {

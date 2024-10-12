@@ -1,5 +1,201 @@
 <template>
   <v-app id="inspire">
+
+    <div class="text-right">
+    <v-menu
+      v-model="menu"
+      :close-on-content-click="false"
+      location="end"
+    >
+      <template v-slot:activator="{ props }">
+
+        <v-chip
+         v-bind="props"
+      class="ma-2"
+      color="primary"
+      variant="outlined"
+    >
+     Account
+      <v-icon icon="mdi-account-outline" end></v-icon>
+    </v-chip>
+      </template>
+
+      <v-card min-width="300">
+        <v-list>
+          <v-list-item
+            prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
+            :subtitle="UserRole"
+            :title="UserConnected.name"
+          >
+            <template v-slot:append>
+              <v-btn
+                :class="fav ? 'text-red' : ''"
+                icon="mdi mdi-emoticon-excited-outline"
+                variant="text"
+                @click="fav = !fav"
+              ></v-btn>
+            </template>
+          </v-list-item>
+        </v-list>
+
+        <v-divider></v-divider>
+
+        <v-list>
+          <v-list-item>
+                <v-btn
+              color="primary"
+              prepend-icon= "mdi-account-circle-outline"
+              text="Vieuw Profil"
+              class="text-none"
+              variant="outlined"
+                @click="dialogProfil = true"
+              flat>  </v-btn>
+     
+              <v-dialog
+                v-model="dialogProfil"
+                max-width="500"
+              >
+                    <v-card
+                      class="mx-auto"
+                      max-width="100vh"
+                    >
+                      <v-card-item class="bg-cyan-darken-1">
+                        <v-card-title>
+                          <span class="text-h5">{{UserConnected.name}}</span>
+                        </v-card-title>
+
+                        <template v-slot:append>
+                          <v-defaults-provider
+                            :defaults="{
+                              VBtn: {
+                                variant: 'text',
+                                density: 'comfortable',
+                              }
+                            }"
+                          >                        
+                            <v-btn   @click="dialogEditProfil = true" icon="mdi-pencil"></v-btn>
+
+                            <v-btn  @click="dialogProfil = false" icon="mdi mdi-close"></v-btn>
+                          </v-defaults-provider>
+                        </template>
+                      </v-card-item>
+
+                      <v-list>                
+
+                        <v-list-item
+                          append-icon="mdi-message-text"
+                          prepend-icon="mdi-phone"
+                          title="(323) 555-6789"
+                        ></v-list-item>
+
+                        <v-divider inset></v-divider>
+
+                        <v-list-item
+                          prepend-icon="mdi-email"
+                          :title="UserConnected.email"
+                        ></v-list-item>
+
+                        <v-divider inset></v-divider>
+
+                        <v-list-item
+                          prepend-icon="mdi-map-marker"
+                          title="Orlando, FL 79938"
+                        ></v-list-item>
+                      </v-list>
+
+                      <v-img
+                        height="200"
+                        src="https://picsum.photos/700?image=996"
+                        cover
+                      ></v-img>
+                    </v-card>              
+             </v-dialog>
+                 <v-dialog
+                      v-model="dialogEditProfil"
+                      max-width="500"
+                    >
+                    <v-card rounded="lg">
+                             <v-card-title class="d-flex justify-space-between align-center">
+                                   <div class="text-h5 text-medium-emphasis ps-2">
+                                          Edit Profil
+                                  </div>
+                                <v-btn
+                                    icon="mdi-close"
+                                     variant="text"
+                                    @click="isActive.value = false"
+                                ></v-btn>
+                              </v-card-title>
+
+                              <v-divider class="mb-4"></v-divider>
+
+                              <v-card-text>
+                                        <div class="mb-2">Name</div>
+                                        <div class="text-medium-emphasis mb-4">
+                                          <v-text-field        
+                                          v-model="UserConnected.name"                                                      
+                                              label="Name"
+                                            ></v-text-field> 
+                                            <div class="mb-2">Mail</div>   
+                                            <v-text-field    
+                                            v-model="UserConnected.email"                                                           
+                                              label="Mail"
+                                            ></v-text-field>    
+                                            <div class="mb-2">Another</div>
+                                            <v-text-field                
+                                            v-model="UserConnected.roles"                                               
+                                              label="Another"
+                                            ></v-text-field>                                
+                                          </div>
+                                      
+                                      </v-card-text>
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+
+                          <v-btn
+                            text="Close"
+                            variant="text"
+                            @click="dialogEditProfil = false"
+                          ></v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+
+          </v-list-item>
+          <v-list-item>
+              <v-btn
+                @click="Logout"
+              color="red"
+              append-icon= "mdi mdi-location-exit"
+              text="Disconnect"
+              class="text-none"
+            
+                >  </v-btn>
+          </v-list-item>
+        </v-list>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            variant="text"
+            @click="menu = false"
+          >
+            Cancel
+          </v-btn>
+          
+        </v-card-actions>
+      </v-card>
+    </v-menu>
+  </div>
+   <!-- <v-system-bar>
+      <v-spacer></v-spacer>
+
+      <v-icon>mdi-square</v-icon>
+
+      <v-icon>mdi-circle</v-icon>
+
+      <v-icon>mdi-triangle</v-icon>
+    </v-system-bar> -->
     <v-navigation-drawer 
     v-model="drawer"
     color="#1569C7">
@@ -10,13 +206,13 @@
       >
       <div
       @click="dialog = !dialog">
-        <v-avatar
-          class="mb-4"
-          color="grey-darken-1"
-          size="64"
-        ></v-avatar>
+        <v-avatar class="mb-4" size="64" >
+          <v-img alt="Avatar" src="https://cdn.vuetifyjs.com/images/john.jpg" ></v-img>
+      </v-avatar>
+        
+   
 
-        <div>{{UserConnected.name}}</div>
+      <div>  <v-chip color="secondary" variant="flat">  <v-icon icon="mdi-account-circle-outline" start> </v-icon> {{UserConnected.name}}  </v-chip></div>
       </div>
       
     <v-fade-transition hide-on-leave>
@@ -35,17 +231,22 @@
         <v-divider></v-divider>
 
         <div class="py-12 text-center">
-          <v-avatar
-          class="mb-4"
-          color="grey-darken-1"
-          size="64"
-        ></v-avatar>
+          <v-avatar class="mb-4" size="64" >
+             <v-img alt="Avatar" src="https://cdn.vuetifyjs.com/images/john.jpg" ></v-img>
+      </v-avatar>
 
-          <div class="text-h4 font-weight-bold">Profil of the user</div>
+              <div class="text-h6 font-weight-bold">
+                <v-btn color="blue"  class="ma-2"  >
+                      <v-icon icon="mdi-account-star-outline" start></v-icon> {{UserConnected.name}}
+                </v-btn>
+                <v-btn class="ma-2" color="red">
+                  <v-icon :icon="UserIcon" start></v-icon>{{UserRole}}
+                  </v-btn>             
+              </div>
         </div>
 
         <v-divider></v-divider>
-
+<!--
         <div class="pa-4 text-end">
           <v-btn
             class="text-none"
@@ -57,7 +258,15 @@
           >
             Close
           </v-btn>
-        </div>
+        </div> 
+         <v-list-item
+          v-for="[icon, text, route] in links"
+          :key="icon"
+          :prepend-icon="icon"
+          :title="text"
+          :to="route"
+          link
+        ></v-list-item>-->
       </v-card>
     </v-fade-transition>
        
@@ -65,25 +274,24 @@
 
       <v-divider></v-divider>
       <v-list>
-        <v-list-item
+       
+        <v-list-item >
+          <v-btn
           v-for="[icon, text, route] in links"
           :key="icon"
           :prepend-icon="icon"
-          :title="text"
+          :text="text"
           :to="route"
-          link
-        ></v-list-item>
+          class="mb-2"
+           rounded="xl"
+          variant="tonal" 
+           block></v-btn>
+        </v-list-item>
+        
+     
         <div class="pa-4 text-end">
-          <v-btn
-            class="text-none"
-            color="medium-emphasis"
-            min-width="92"
-            variant="outlined"
-            rounded
-            @click="Logout"
-          >
-            Logout
-          </v-btn>
+       
+        
         </div>
       </v-list>
     </v-navigation-drawer>
@@ -111,6 +319,7 @@
     ['mdi-inbox-arrow-down', 'Inbox' ,'/inbox'],
     ['mdi-send', 'Send' , '/send'],
     ['mdi-timeline-text-outline', 'History' ,'/history'],
+    ['mdi-account-circle-outline', 'User' ,'/user'],
    
   ]
 
@@ -122,10 +331,19 @@
    import axios from '../plugins/axios' 
   export default {
     data: () => ({
+      
       previousRoute: '',
       drawer: null,
       dialog:false,
+      dialogProfil: false,
+      dialogEditProfil: false,
       UserConnected:[],
+      UserRole:null,
+      UserIcon:null,
+      fav: true,
+      menu: false,
+      message: false,
+      hints: true,
     }),
     created(){
       this.GetUserConnected();
@@ -134,6 +352,7 @@
         
        },
     methods: {
+     
       async GetUserConnected(){
           try{
               
@@ -141,7 +360,15 @@
                   console.log('Données recu avec succès', response.data);
                    this.UserConnected = response.data;               
                    localStorage.setItem("user-info", this.UserConnected.name );  
-                   localStorage.setItem("user-info-id", this.UserConnected.id );  
+                   localStorage.setItem("user-info-id", this.UserConnected.id ); 
+                   if(this.UserConnected.roles[0] == 
+                   "ROLE_ADMIN"){
+                    this.UserRole = "ADMIN"
+                    this.UserIcon =" mdi-shield-crown-outline"
+                   }else{
+                     this.UserRole = "USER"
+                      this.UserIcon =" mdi-shield-account"
+                   }
             }catch (error) {
               if (error.response) {
                   // Le serveur a répondu avec un code d'erreur (ex: 400, 500)
