@@ -86,7 +86,7 @@
 </div>
   </template>
   <script>
-    import axios from '../plugins/axios' 
+    import axios from '../../plugins/axios' 
     export default {
       data: () => ({
        register: { 
@@ -149,7 +149,7 @@
              const response = await axios.post("/register", formData)
               .then((response) => {
                 // Gérer la réponse de succès
-                this.$router.push({name:"login"})
+                    console.log('Success:', response.data);
               })
               .catch((error) => {
                 // Gérer l'erreur

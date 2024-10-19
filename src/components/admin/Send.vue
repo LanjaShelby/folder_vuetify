@@ -148,7 +148,7 @@
    </script>
    
    <script>
-      import axios from '../plugins/axios' 
+    import axios from '../../plugins/axios' 
      export default {
        data: () => ({
         select:"",

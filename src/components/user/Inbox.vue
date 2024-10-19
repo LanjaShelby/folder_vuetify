@@ -27,7 +27,7 @@
                          Service: {{Message.recipient_service.libelle_name}}
                           </h1>
                          <p class="font-weight-medium">
-                          {{Message.sender.name}} @   <span class="font-weight-light"> {{Message.created_at.split(' ')[1]}} </span>
+                          {{Message.sender.name}} to {{Message.recipientName}} @   <span class="font-weight-light"> {{Message.created_at.split(' ')[1]}} </span>
                            </p>
                      
                          <h1 class="text-overline">
@@ -197,7 +197,7 @@
                                                 required>
                                               </v-select>
                                         </div>
-                                        <div class="mb-2">Observation</div>
+                                        <div class="mb-2">Message</div>
   
                                         <v-textarea
                                             ref="message"
@@ -416,23 +416,28 @@
                     <v-list-item
                     @click="openDialog(Message)"
                     style="background-color:#F5F5F5;">
-                    <template v-slot:prepend>
-                        <v-avatar size="x-large" > <v-icon icon="mdi-account-circle"></v-icon></v-avatar>
+                      <template v-slot:prepend>
+                        <v-avatar color="grey-darken-1"></v-avatar>
                       </template>
-                      <h1 class="text-overline">
-                         Service: {{Message.recipient_service.libelle_name}}
-                          </h1>
-                         <p class="font-weight-medium">
-                          {{Message.sender.name}} @   <span class="font-weight-light"> {{Message.created_at.split(' ')[1]}} </span>
-                           </p>
-                     
-                         <h1 class="text-overline">
-                         Subject: {{Message.title}}
-                          </h1>
+                         <h1>  {{Message.sender.name}} to {{Message.recipientName}} @ {{Message.created_at.split(' ')[1]}} </h1>
+                         <h3>  {{Message.title}} </h3>
+                         <p>
+                      {{Message.message}}          
+                         </p> 
                          
-                         <v-chip color="secondary" variant="flat">
-                      {{Message.files.length}} Files
-                          </v-chip>
+                        <v-chip-group
+                            variant="flat"
+                            mandatory
+                            multiple
+                          >
+                             <v-chip 
+                             v-for='file in Message.files ' :key="file"
+                              class="me-2"
+                              color="deep-purple-accent-4"
+                              size="small"
+                              label> Filename: {{ file.path}}
+                            </v-chip>
+                         </v-chip-group>
               
 
 
@@ -911,7 +916,7 @@
 
    
    <script>
-     import axios from '../plugins/axios' 
+    import axios from '../../plugins/axios' 
      export default {
        data: () => ({
         isDialogOpen:false,

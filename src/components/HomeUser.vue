@@ -23,7 +23,7 @@
       <v-card min-width="300">
         <v-list>
           <v-list-item
-           :prepend-avatar="getImageUrl(UserConnected.image)"
+            prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
             :subtitle="UserRole"
             :title="UserConnected.name"
           >
@@ -83,12 +83,10 @@
                       <v-list>                
 
                         <v-list-item
-                         
+                          append-icon="mdi-message-text"
                           prepend-icon="mdi-phone"
-                          :title="UserConnected.phone"
+                          title="(323) 555-6789"
                         ></v-list-item>
-
-                        
 
                         <v-divider inset></v-divider>
 
@@ -100,20 +98,14 @@
                         <v-divider inset></v-divider>
 
                         <v-list-item
-                         
-                          prepend-icon="mdi-phone"
-                          :title="UserConnected.fonction"
-                        ></v-list-item>
-
-                        <v-list-item
                           prepend-icon="mdi-map-marker"
-                          :title="UserConnected.service"
+                          title="Orlando, FL 79938"
                         ></v-list-item>
                       </v-list>
 
                       <v-img
                         height="200"
-                        :src="getImageUrl(UserConnected.image)"
+                        src="https://picsum.photos/700?image=996"
                         cover
                       ></v-img>
                     </v-card>              
@@ -130,7 +122,7 @@
                                 <v-btn
                                     icon="mdi-close"
                                      variant="text"
-                                    @click="dialogEditProfil = false"
+                                    @click="isActive.value = false"
                                 ></v-btn>
                               </v-card-title>
 
@@ -148,17 +140,11 @@
                                             v-model="UserConnected.email"                                                           
                                               label="Mail"
                                             ></v-text-field>    
-
-                                            <div class="mb-2">Phone</div>
+                                            <div class="mb-2">Another</div>
                                             <v-text-field                
-                                            v-model="UserConnected.phone"                                               
+                                            v-model="UserConnected.roles"                                               
                                               label="Another"
-                                            ></v-text-field>  
-                                            <div class="mb-2">Fonction</div>
-                                            <v-text-field                
-                                            v-model="UserConnected.fonction"                                               
-                                              label="Another"
-                                            ></v-text-field>                              
+                                            ></v-text-field>                                
                                           </div>
                                       
                                       </v-card-text>
@@ -221,7 +207,7 @@
       <div
       @click="dialog = !dialog">
         <v-avatar class="mb-4" size="64" >
-          <v-img alt="Avatar" :src="getImageUrl(UserConnected.image)" ></v-img>
+          <v-img alt="Avatar" src="https://cdn.vuetifyjs.com/images/john.jpg" ></v-img>
       </v-avatar>
         
    
@@ -330,10 +316,10 @@
 
   const cards = ['Today', 'Yesterday']
   const links = [
-    ['mdi-inbox-arrow-down', 'Inbox' ,'/admin/inbox'],
-    ['mdi-send', 'Send' , '/admin/send'],
-    ['mdi-timeline-text-outline', 'History' ,'/admin/history'],
-    ['mdi-account-circle-outline', 'User' ,'/admin/user'],
+    ['mdi-inbox-arrow-down', 'Inbox' ,'/user/Uinbox'],
+    ['mdi-send', 'Send' , '/user/Usend'],
+    ['mdi-timeline-text-outline', 'History' ,'/user/Uhistory'],
+    ['mdi-account-circle-outline', 'User' ,'/user/Uuser'],
    
   ]
 
@@ -401,9 +387,6 @@
                   console.error('Erreur lors de l\'envoi', error.message);
                 }
             }
-    },
-    getImageUrl(imageName) {
-      return `http://127.0.0.1:8000/files/UserImage/${imageName}`; // Remplacez par l'URL correcte
     },
         async Logout(){
           try{

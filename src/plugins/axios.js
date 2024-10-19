@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Crée une instance Axios avec une configuration par défaut
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8080/api', // L'URL de base pour toutes tes requêtes
+  baseURL: 'http://127.0.0.1:8000/api', // L'URL de base pour toutes tes requêtes
   timeout: 10000, // Temps limite des requêtes
   withCredentials: true,
 //  headers: {

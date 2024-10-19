@@ -14,8 +14,11 @@ import Inbox from "../components/Inbox.vue"
 import Login from "../components/Loginn.vue"
 import Send from "../components/Send.vue"
 import Register from "../components/Register.vue"
+
+import HomeUser from "../components/HomeUser.vue"
 import Home from "../components/Home.vue"
 import HomeLogin from "../components/HomeLogin.vue"
+
 import User from "../components/User.vue"
 
 //import { routes } from 'vue-router/auto-routes'
@@ -24,29 +27,42 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: 
       [
+
+
         {
-          path: '/',
+          path: '/admin',
           component: Home, // Utilise le Home  pour cette route
           children: [
-            { path: '',name: "inboxHome",  component:() => import('@/components/Inbox.vue')},
-            { path: 'send',name: "send", component:() => import('@/components/Send.vue') },
-            { path: 'inbox',name: "inbox", component: () => import('@/components/Inbox.vue') },
-            { path: 'history',name: "history", component: () => import('@/components/History.vue') },
-            { path: 'user',name: "user", component: () => import('@/components/User.vue') },
+            { path: '',name: "admininboxHome",  component:() => import('@/components/admin/Inbox.vue')},
+            { path: 'send',name: "adminsend", component:() => import('@/components/admin/Send.vue') },
+            { path: 'inbox',name: "admininbox", component: () => import('@/components/admin/Inbox.vue') },
+            { path: 'history',name: "adminhistory", component: () => import('@/components/admin/History.vue') },
+            { path: 'user',name: "adminuser", component: () => import('@/components/admin/User.vue') },
+          ],
+        },
+        {
+          path: '/user',
+          component: HomeUser, // Utilise le Home  pour cette route
+          children: [
+            { path: '',name: "userinboxHome",  component:() => import('@/components/user/Inbox.vue')},
+            { path: 'Usend',name: "usersend", component:() => import('@/components/user/Send.vue') },
+            { path: 'Uinbox',name: "userinbox", component: () => import('@/components/user/Inbox.vue') },
+            { path: 'Uhistory',name: "userhistory", component: () => import('@/components/user/History.vue') },
+            { path: 'Uuser',name: "useruser", component: () => import('@/components/user/User.vue') },
           ],
         },
         {
           path: '/login',
           component: HomeLogin, // Utilise le HomeLogin pour cette route
           children: [
-            { path: '',name: "login", component: () => import('@/components/Loginn.vue') },
+            { path: '',name: "login", component: () => import('@/components/login/Loginn.vue') },
           ],
         },
         {
           path: '/register',
           component: HomeLogin, // Utilise le layout minimal pour cette route
           children: [
-            { path: '',name: "register", component: () => import('@/components/Register.vue') },
+            { path: '',name: "register", component: () => import('@/components/login/Register.vue') },
           ],
         },
        
