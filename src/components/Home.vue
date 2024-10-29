@@ -2,6 +2,7 @@
   <v-app id="inspire">
 
     <div class="text-right">
+      <v-icon > mdi mdi-message-badge-outline </v-icon>
     <v-menu
       v-model="menu"
       :close-on-content-click="false"

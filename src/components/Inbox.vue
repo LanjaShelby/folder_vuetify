@@ -19,7 +19,7 @@
 
                     <v-list-item
                     @click="openDialog(Message)"
-                    style="background-color:#F5F5F5;">
+                    style="background-color: #454545;">
                       <template v-slot:prepend>
                         <v-avatar size="x-large" > <v-icon icon="mdi-account-circle"></v-icon></v-avatar>
                       </template>
