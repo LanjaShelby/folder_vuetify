@@ -38,6 +38,7 @@ const router = createRouter({
             { path: 'inbox',name: "admininbox", component: () => import('@/components/admin/Inbox.vue') },
             { path: 'history',name: "adminhistory", component: () => import('@/components/admin/History.vue') },
             { path: 'user',name: "adminuser", component: () => import('@/components/admin/User.vue') },
+            { path: 'envoyer',name: "adminenvoyer", component: () => import('@/components/admin/Envoyer.vue') },
           ],
         },
         {

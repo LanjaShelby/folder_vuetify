@@ -47,7 +47,19 @@
                       {{Message.files.length}} Files
                           </v-chip> <br>
                           <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" /> <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" />  
+                          <v-badge
+                              :content="ReplyCounts[Message.id]"
+                              color="primary"
+                              overlap
+                              bordered
+                              v-if="ReplyCount[Message.id] > 0"
+                            >
                           <v-btn class="ma-2 absolute" color="info"  @click ="replyMessage(Message)"
+                          >
+                            <v-icon icon="mdi mdi-message-reply-text-outline" ></v-icon> 
+                            </v-btn> 
+                          </v-badge>
+                          <v-btn class="ma-2 absolute" v-else color="info"  @click ="replyMessage(Message)"
                           >
                             <v-icon icon="mdi mdi-message-reply-text-outline" ></v-icon> 
                             </v-btn> 
@@ -484,6 +496,7 @@
                 </v-list>
               </v-card>
             </v-col>
+
             <v-col
               cols="12"
             >
@@ -494,392 +507,477 @@
                   <v-list-subheader :title="'Yesterday' +', '+ yesterdayDate " ></v-list-subheader>
                 
                     <template v-for="Message in yesterdayMessages" :key="Message" ">
+                    <v-list-item
+                      @click="openDialog(Message)"
+                      :class="{'unread-message': !Message.is_read, 'read-message': Message.is_read}"
+                
+                    
+                    >
+                      <template v-slot:prepend>
+                        <v-avatar size="x-large" > <v-icon icon="mdi-account-circle"></v-icon></v-avatar>
+                      </template>
+                           
+                          <p class="font-weight-medium  text-h5">
+                              <span style="font-size: 25px;" :class= "{'mdi mdi-shield-crown-outline text-error': Message.sender.roles[0] == 'ROLE_ADMIN','mdi mdi-shield-account-outline text-primary' :Message.sender.roles[0] == 'ROLE_USER'}" >                   
+                                  </span> 
+                              {{Message.sender.name}}
+                                <span style="font-size: 25px;" :class= "{'mdi mdi-shield-crown-outline text-error' : Message.sender.roles[0] == 'ROLE_ADMIN','mdi mdi-shield-account-outline text-primary' :Message.sender.roles[0] == 'ROLE_USER'}" >   
+                                  </span> 
+                                <strong >@</strong>   <span class="font-weight-light text-h6"> {{Message.created_at.split(' ')[1]}} </span>
+                           </p>
+                           <h1 class="text-overline">
+                            <span class="text-decoration-underline" >From Service</span> : {{Message.senderService}}
+                          </h1>
+                     
+                         <h1 class="text-overline">
+                        <span class="text-decoration-underline" >Subject</span> : {{Message.title}}
+                          </h1>
+                         
+                         <v-chip color="secondary" variant="flat">
+                      {{Message.files.length}} Files
+                          </v-chip> <br>
+                          <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" /> <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" />  
+                          <v-badge
+                              :content="ReplyCounts[Message.id]"
+                              color="primary"
+                              overlap
+                              bordered
+                              v-if="ReplyCounts[Message.id]>0"
+                            >
+                          <v-btn class="ma-2 absolute" color="info"  @click ="replyMessage(Message)"
+                          >
+                            <v-icon icon="mdi mdi-message-reply-text-outline" ></v-icon> 
+                            </v-btn> 
+                          </v-badge>
+                          <v-btn class="ma-2 absolute" color="info" v-else @click ="replyMessage(Message)"
+                          >
+                            <v-icon icon="mdi mdi-message-reply-text-outline" ></v-icon> 
+                            </v-btn> 
+                           
+                           
 
-                  <v-list-item
-                  @click="openDialog(Message)"
-                  :class="{'unread-message': !Message.is_read, 'read-message': Message.is_read}"
+                          <!--   <v-chip-group
+                            variant="flat"
+                            mandatory
+                          >
+                             <v-chip 
+                             v-for='file in Message.files ' :key="file"
+                              class="me-2"
+                              color="deep-purple-accent-4"
+                              size="small"
+                              label> Filename: {{ file.path}}
+                            </v-chip>
+                         </v-chip-group>
 
-
-                  >
-                    <template v-slot:prepend>
-                      <v-avatar size="x-large" > <v-icon icon="mdi-account-circle"></v-icon></v-avatar>
-                    </template>
-                    <h1 class="text-overline">
-                      Service: {{Message.recipient_service.libelle_name}}
-                        </h1>
-                      <p class="font-weight-medium">
-                        {{Message.sender.name}} to {{Message.recipientName}} @   <span class="font-weight-light"> {{Message.created_at.split(' ')[1]}} </span>
-                        </p>
-                  
-                      <h1 class="text-overline">
-                      Subject: {{Message.title}}
-                        </h1>
-                      
-                      <v-chip color="secondary" variant="flat">
-                    {{Message.files.length}} Files
-                        </v-chip> <br>
-                        <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" /> <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" />
-
-
-                        <!--   <v-chip-group
-                          variant="flat"
-                          mandatory
-                        >
-                          <v-chip 
-                          v-for='file in Message.files ' :key="file"
-                            class="me-2"
-                            color="deep-purple-accent-4"
-                            size="small"
-                            label> Filename: {{ file.path}}
-                          </v-chip>
-                      </v-chip-group>
-
-                      CONTENT MESSAGE -->
-                      <v-dialog
-                            v-model="isDialogOpen"
-                                    transition="dialog-bottom-transition" 
-                                    width='100vh' 
-                                    class="justify-center"                             
-                                  >
-                                  
-                                        <v-card
-                                        class="mx-auto"
-                                        color="#FFFFFF"
-                                        max-width="650"
-                                        min-height="350"
-                                        theme="dark"
-                                        variant="flat"
-                                      >
-                                        <v-sheet color="#C77416">
-                                          <v-card-item>
-                                            <template v-slot:prepend>
-                                              <v-card-title>
-                                                <v-avatar >
-                                                  <v-icon icon="mdi-account-circle"></v-icon>
-                                                </v-avatar>
-
-                                              {{clickMessage.sender.name}}
-                                              </v-card-title>
-                                            </template>
-
-                                            <v-divider class="mx-2" vertical></v-divider>                                      
-                                            <template v-slot:append>
-                                              <v-btn
-                                                icon="$close"
-                                                size="large"
-                                                variant="text"
-                                                @click ="isDialogOpen = false"
-                                              ></v-btn>
-                                            </template>
-                                          </v-card-item>
-                                        </v-sheet>
-
-                                        <v-card
-                                          class="ma-4"
-                                          color="#2f3136"
-                                          rounded="lg"
+                        CONTENT MESSAGE -->
+                        <v-dialog
+                               v-model="isDialogOpen"
+                                      transition="dialog-bottom-transition" 
+                                      width='100vh' 
+                                      class="justify-center"                             
+                                    >
+                                    
+                                          <v-card
+                                          class="mx-auto"
+                                          color="#FFFFFF"
+                                          max-width="650"
+                                          min-height="350"
+                                          theme="dark"
                                           variant="flat"
                                         >
-                                          <v-card-item>
-                                            <v-card-title class="text-body-2 d-flex align-center">
-                                              <v-icon
-                                                color="#949cf7"
-                                                icon="mdi-calendar"
-                                                start
-                                              ></v-icon>
+                                          <v-sheet color="#C77416">
+                                            <v-card-item>
+                                              <template v-slot:prepend>
+                                                <v-card-title>
+                                                  <v-avatar >
+                                                    <v-icon icon="mdi-account-circle"></v-icon>
+                                                  </v-avatar>
 
-                                              <span class="text-medium-emphasis font-weight-bold">{{clickMessage.created_at.split(' ')[0]}} -{{clickMessage.created_at.split(' ')[1]}}</span>
+                                                 {{clickMessage.sender.name}}
+                                                </v-card-title>
+                                              </template>
 
-                                              <v-spacer></v-spacer>
+                                              <v-divider class="mx-2" vertical></v-divider>                                      
+                                              <template v-slot:append>
+                                                <v-btn
+                                                  icon="$close"
+                                                  size="large"
+                                                  variant="text"
+                                                   @click ="isDialogOpen = false"
+                                                ></v-btn>
+                                              </template>
+                                            </v-card-item>
+                                          </v-sheet>
 
-                                            
+                                          <v-card
+                                            class="ma-4"
+                                            color="#2f3136"
+                                            rounded="lg"
+                                            variant="flat"
+                                          >
+                                            <v-card-item>
+                                              <v-card-title class="text-body-2 d-flex align-center">
+                                                <v-icon
+                                                  color="#949cf7"
+                                                  icon="mdi-calendar"
+                                                  start
+                                                ></v-icon>
 
-                                            
-                                            </v-card-title>
+                                                <span class="text-medium-emphasis font-weight-bold">{{clickMessage.created_at.split(' ')[0]}} -{{clickMessage.created_at.split(' ')[1]}}</span>
 
-                                            <div class="py-2">
-                                              <div class="text-h6">{{clickMessage.title}}:</div>
+                                                <v-spacer></v-spacer>
 
-                                              <div class="font-weight-light text-medium-emphasis">
-                                                {{clickMessage.message}}
+                                              
+
+                                               
+                                              </v-card-title>
+
+                                              <div class="py-2">
+                                                <div class="text-h6">{{clickMessage.title}}:</div>
+
+                                                <div class="font-weight-light text-medium-emphasis">
+                                                  {{clickMessage.message}}
+                                                </div>
                                               </div>
+                                            </v-card-item>
+
+                                            <v-divider></v-divider>
+
+                                            <div class="pa-4 d-flex align-center">
+                                              <div class="text-h6">Files:</div>
+                                              <v-chip-group
+                                                variant="flat"
+                                               column
+                                              class="pa-2"
+                                              >
+                                                <v-chip 
+                                                v-for='file in this.clickMessage.files ' :key="file"
+                                                v-model="this.clickMessage.files"
+                                                  class="me-2"
+                                                  color="deep-purple-accent-4"
+                                                  size="small"
+                                                  label> {{ file.path}}
+                                                </v-chip>
+                                            </v-chip-group>
                                             </div>
-                                          </v-card-item>
-
-                                          <v-divider></v-divider>
-
-                                          <div class="pa-4 d-flex align-center">
-                                            <div class="text-h6">Files:</div>
-                                            <v-chip-group
-                                              variant="flat"
-                                            column
-                                            class="pa-2"
-                                            >
-                                              <v-chip 
-                                              v-for='file in this.clickMessage.files ' :key="file"
-                                              v-model="this.clickMessage.files"
-                                                class="me-2"
-                                                color="deep-purple-accent-4"
-                                                size="small"
-                                                label> {{ file.path}}
-                                              </v-chip>
-                                          </v-chip-group>
-                                          </div>
+                                          </v-card>
                                         </v-card>
-                                      </v-card>
-                        </v-dialog>
+                          </v-dialog>
+<!-- content reply-->
+                        <v-dialog
+                               v-model="isReplyOpen"
+                                      transition="dialog-bottom-transition" 
+                                      width='100vh' 
+                                      class="justify-center"                             
+                                    >
+                                    
+                                          <v-card
+                                          class="mx-auto"
+                                          color="#FFFFFF"
+                                          width="800"
+                                          min-height="200"
+                                          variant="flat"
+                                          rounded="bg"
+                                        >
+                                          <v-sheet color="info">
+                                            <v-card-item>
+                                              <template v-slot:prepend>
+                                                <v-card-title>
+                                                 Reply Message                                     
+                                                </v-card-title>
+                                              </template>
+                                             
+                                              <v-divider class="mx-2" vertical></v-divider>  
+                                              
+                                             
+                                              <template v-slot:append>
+                                                <v-btn
+                                                  icon="$close"
+                                                  size="large"
+                                                  variant="text"
+                                                   @click ="isReplyOpen = false"
+                                                ></v-btn>
+                                              </template>
+                                            </v-card-item>
+                                          </v-sheet>
+                                           
+                                          <v-list lines="one">
+                                                <v-list-subheader>User Controls</v-list-subheader>
+                                                
+                                              <v-list-item  
+                                              v-for="message in Reply"
+                                              prepend-avatar="https://cdn.vuetifyjs.com/images/logos/v-alt.svg">
+                                                  <v-list-item-title>{{message.sender.name}}</v-list-item-title>
+
+                                                  <v-list-item-subtitle>
+                                                    {{message.message}}
+                                                      </v-list-item-subtitle>
+                                                </v-list-item>                      
+                                              </v-list>    
+                                              <v-card-actions class="my-2 d-flex justify-end">
+                                        <v-btn
+                                          class="text-none"
+                                          rounded="xl"
+                                          text="Cancel"
+                                          @click="isReplyOpen = false"
+                                        ></v-btn> 
+                                      </v-card-actions>                       
+                                        </v-card>
+                          </v-dialog>
+
+              
 
 
-
-                      <div class="d-flex justify-space-around " style="padding:20px;">
-                      
-
-                        <v-btn color="primary"
-                              append-icon="mdi-message-reply-outline" 
-                              end 
-                              @click="SelectMessage(Message)"
-                                        
-                            >  Reply                          
-                              <v-dialog activator="parent" max-width="500">
-                                <template v-slot:default="{ isActive }">
-                                  <v-card rounded="lg">
-                                    <v-card-title class="d-flex justify-space-between align-center">
-                                      <div class="text-h5 text-medium-emphasis ps-2">
-                                        Reply the message
-                                      </div>
-                                    <v-btn
-                                        icon="mdi-close"
-                                        variant="text"
-                                        @click="isActive.value = false"
-                                      ></v-btn>
-                                    </v-card-title>
-
-                                    <v-divider class="mb-4"></v-divider>
-
-                                    <v-card-text>
-                                      <div class="mb-2">Destinataire</div>
-                                      <div class="text-medium-emphasis mb-4">
-                                        <v-text-field
-                                        prepend-icon="mdi-card-account-mail"
-                                              model-value="Destinataire"
-                                              readonly
-                                              v-model="clickMessage.sender.name"
-                                            ></v-text-field>
-                                        </div>
-                                      <div class="mb-2">Statut</div>
-                                      <div class="text-medium-emphasis mb-4">
-                                        <v-select 
-                                              ref="Statut"
-                                              v-model="Statut"
-                                              :item-props="statut"  
-                                              :items="statut" 
-                                              :rules="[() => !!Statut || 'This field is required']"
-                                              label="Destinataire"
-                                              placeholder="Select..."
-                                              prepend-icon="mdi-card-account-mail"
-                                              hint="Destinataire du message"
-                                              required>
-                                            </v-select>
-                                      </div>
-                                      <div class="mb-2">Observation</div>
-
-                                      <v-textarea
-                                          ref="message"
-                                            prepend-icon="mdi-comment"
-                                            hint="Contenue du message"
-                                            clear-icon="mdi-close-circle"
-                                            label="Text"
-                                            model-value="This is clearable text."
-                                            clearable
-                                            counter="325"
-                                            required
-                                            placeholder="Votre message"
-                                            v-model="this.message"
-                                            :rules="[
-                                            () => !!this.message || 'This field is required',
-                                            () => !!this.message && this.message.length <= 325 || 'Message must be less than 325 characters',
-                                                    messageCheck
-                                                ]"
-                                        ></v-textarea>
-                            
-                                    </v-card-text>
-
-                                    <v-divider class="mt-2"></v-divider>
-
-                                    <v-card-actions class="my-2 d-flex justify-end">
-                                      <v-btn
-                                        class="text-none"
-                                        rounded="xl"
-                                        text="Cancel"
-                                        @click="isActive.value = false"
-                                      ></v-btn>
-
-                                      <v-btn
-                                        class="text-none"
-                                        color="primary"
-                                        rounded="xl"
-                                        text="Send"
-                                        variant="flat"
-                                        @click="ShareMessage(isActive)"
-                                      ></v-btn>
-                                    </v-card-actions>
-                                  </v-card>
-                                </template>
-                              </v-dialog>
-                            </v-btn>
-                      
-                  <!-- Content of Messages-->
-                          
-
-                  <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
-
-                      <!-- Share -->
-                      
+<!--xxxxxxxxxxxxxxxxxxxxxx-->
+                          <!-- reply-->
+                         <div class="d-flex justify-space-around " style="padding:20px;">
+                        
+  
                           <v-btn color="primary"
-                              append-icon="mdi-share-variant-outline"
-                              end            
-                              @click="SelectMessage(Message)"
-                            >  Share                           
-                              <v-dialog activator="parent" max-width="500">
-                                <template v-slot:default="{ isActive }">
-                                  <v-card rounded="lg">
-                                    <v-card-title class="d-flex justify-space-between align-center">
-                                      <div class="text-h5 text-medium-emphasis ps-2">
-                                        Share the message
-                                      </div>
-                                    <v-btn
-                                        icon="mdi-close"
-                                        variant="text"
-                                        @click="isActive.value = false"
-                                      ></v-btn>
-                                    </v-card-title>
-
-                                    <v-divider class="mb-4"></v-divider>
-
-                                    <v-card-text>
-                                      <div class="mb-2">Destinataire</div>
-                                      <div class="text-medium-emphasis mb-4">
-                                        <v-select
-                                          v-model="selectService"
-                                          :hint="`${selectService.text}, ${selectService.value}`"
-                                          :items="ServiceOptions"
-                                          item-title="text"
-                                          item-value="value"
-                                        
-                                          label="Destinataire"
-                                          placeholder="Select..."
-                                          prepend-icon="mdi-card-account-mail"
-                                          persistent-hint
-                                          return-object
-                                          single-line  
-                                          required 
-                                      ></v-select>
-                                      </div>
-
-                                      <div class="mb-2">Message</div>
-
-                                      <v-textarea
-                                          ref="message"
-                                            prepend-icon="mdi-comment"
-                                            hint="Contenue du message"
-                                            clear-icon="mdi-close-circle"
-                                            label="Text"
-                                            model-value="This is clearable text."
-                                            clearable
-                                            counter="325"
-                                            required
-                                            placeholder="Votre message"
-                                            v-model="this.clickMessage.message"
-                                            :rules="[
-                                            () => !!this.clickMessage.message || 'This field is required',
-                                            () => !!this.clickMessage.message && this.clickMessage.message.length <= 325 || 'Message must be less than 325 characters',
-                                                    messageCheck
-                                                ]"
-                                        ></v-textarea>
-
-                                        <v-chip-group
-                                              variant="flat"
-                                              mandatory
-                                            >
-                                              <v-chip 
-                                              v-for='file in this.clickMessage.files ' :key="file"
-                                              v-model="this.clickMessage.files"
-                                                class="me-2"
-                                                color="deep-purple-accent-4"
-                                                size="small"
-                                                label> Filename: {{ file.path}}
-                                              </v-chip>
-                                          </v-chip-group>
-
-                            
-                                    </v-card-text>
-
-                                    <v-divider class="mt-2"></v-divider>
-
-                                    <v-card-actions class="my-2 d-flex justify-end">
-                                      <v-btn
-                                        class="text-none"
-                                        rounded="xl"
-                                        text="Cancel"
-                                        @click="isActive.value = false"
-                                      ></v-btn>
-
-                                      <v-btn
-                                        class="text-none"
-                                        color="primary"
-                                        rounded="xl"
-                                        text="Send"
-                                        variant="flat"
-                                        @click="ShareMessage(isActive)"
-                                      ></v-btn>
-                                    </v-card-actions>
-                                  </v-card>
-                                </template>
-                              </v-dialog>
-                            </v-btn>
-
-                            
-
-
-
-                            <!-- Delete -->
-                                  <v-dialog
-                                    transition="dialog-bottom-transition" 
-                                    width='auto'                              
-                                  >
-                                    <template v-slot:activator="{ props: activatorProps }">
-                                      <v-btn
-                                      v-bind="activatorProps"
-                                      @click= "SelectMessage(Message)"                                  
-                                      color="red" 
-                                      > Delete
-                                        <v-icon icon="mdi-delete-outline"></v-icon> 
-                                    </v-btn>
-                                  </template>
-
+                                append-icon="mdi-message-reply-outline" 
+                                end 
+                                @click="SelectMessage(Message)"
+                                          
+                              >  Reply                          
+                                <v-dialog activator="parent" max-width="500">
                                   <template v-slot:default="{ isActive }">
-                                    <v-card>
-                                      <v-toolbar color="red" title="Delete"> <v-icon icon="mdi-delete-outline" start ></v-icon> </v-toolbar>
-
-                                      <v-card-text class="text-h2 pa-12">
-                                        Would you like delete message of {{clickMessage.senderName}} ?
-                                      </v-card-text>
-
-                                      <v-card-actions class="justify-end">
-                                        <v-btn
-                                          text="Yes"
-                                          @click="DeleteMessage(isActive)"
-                                        ></v-btn>
-                                        <v-btn
-                                          text="No"
+                                    <v-card rounded="lg">
+                                      <v-card-title class="d-flex justify-space-between align-center">
+                                        <div class="text-h5 text-medium-emphasis ps-2">
+                                          Reply the message
+                                        </div>
+                                      <v-btn
+                                          icon="mdi-close"
+                                          variant="text"
                                           @click="isActive.value = false"
+                                        ></v-btn>
+                                      </v-card-title>
+  
+                                      <v-divider class="mb-4"></v-divider>
+  
+                                      <v-card-text>
+                                        <div class="mb-2">Destinataire</div>
+                                        <div class="text-medium-emphasis mb-4">
+                                          <v-text-field
+                                          prepend-icon="mdi-card-account-mail"
+                                                model-value="Destinataire"
+                                                readonly
+                                                v-model="clickMessage.sender.name"
+                                              ></v-text-field>
+                                           </div>
+                                        <div class="mb-2">Statut</div>
+                                        <div class="text-medium-emphasis mb-4">
+                                          <v-select 
+                                                ref="Statut"
+                                                v-model="this.Statut"
+                                                :item-props="statut"  
+                                                :items="statut" 
+                                                :rules="[() => !!Statut || 'This field is required']"
+                                                label="Destinataire"
+                                                placeholder="Select..."
+                                                prepend-icon="mdi-card-account-mail"
+                                                hint="Destinataire du message"
+                                                required>
+                                              </v-select>
+                                        </div>
+                                        <div class="mb-2">Observation</div>
+  
+                                        <v-textarea
+                                            ref="message"
+                                              prepend-icon="mdi-comment"
+                                              hint="Contenue du message"
+                                              clear-icon="mdi-close-circle"
+                                              label="Text"
+                                              model-value="This is clearable text."
+                                              clearable
+                                              counter="325"
+                                              required
+                                              placeholder="Votre message"
+                                              v-model="this.messagereply"
+                                              :rules="[
+                                              () => !!this.messagereply || 'This field is required',
+                                              () => !!this.messagereply && this.messagereply.length <= 325 || 'Message must be less than 325 characters',
+                                                      messageCheck
+                                                  ]"
+                                          ></v-textarea>
+                               
+                                      </v-card-text>
+  
+                                      <v-divider class="mt-2"></v-divider>
+  
+                                      <v-card-actions class="my-2 d-flex justify-end">
+                                        <v-btn
+                                          class="text-none"
+                                          rounded="xl"
+                                          text="Cancel"
+                                          @click="isActive.value = false"
+                                        ></v-btn>
+  
+                                        <v-btn
+                                          class="text-none"
+                                          color="primary"
+                                          rounded="xl"
+                                          text="Send"
+                                          variant="flat"
+                                          @click="ReplyReply(isActive)"
                                         ></v-btn>
                                       </v-card-actions>
                                     </v-card>
                                   </template>
                                 </v-dialog>
-                        </div>
-                  </v-list-item>
+                              </v-btn>
+                        
+  <!-- Content of Messages-->
+                            
+
+  <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+  
+                        <!-- Share -->
+                        
+                            <v-btn color="primary"
+                                append-icon="mdi-share-variant-outline"
+                                end            
+                                @click="SelectMessage(Message)"
+                              >  Share                           
+                                <v-dialog activator="parent" max-width="500">
+                                  <template v-slot:default="{ isActive }">
+                                    <v-card rounded="lg">
+                                      <v-card-title class="d-flex justify-space-between align-center">
+                                        <div class="text-h5 text-medium-emphasis ps-2">
+                                          Share the message
+                                        </div>
+                                      <v-btn
+                                          icon="mdi-close"
+                                          variant="text"
+                                          @click="isActive.value = false"
+                                        ></v-btn>
+                                      </v-card-title>
+  
+                                      <v-divider class="mb-4"></v-divider>
+  
+                                      <v-card-text>
+                                        <div class="mb-2">Destinataire</div>
+                                        <div class="text-medium-emphasis mb-4">
+                                          <v-select
+                                            v-model="selectService"
+                                            :hint="`${selectService.text}, ${selectService.value}`"
+                                            :items="ServiceOptions"
+                                            item-title="text"
+                                            item-value="value"
+                                          
+                                            label="Destinataire"
+                                            placeholder="Select..."
+                                            prepend-icon="mdi-card-account-mail"
+                                            persistent-hint
+                                            return-object
+                                            single-line  
+                                            required 
+                                        ></v-select>
+                                        </div>
+  
+                                        <div class="mb-2">Message</div>
+  
+                                        <v-textarea
+                                            ref="message"
+                                              prepend-icon="mdi-comment"
+                                              hint="Contenue du message"
+                                              clear-icon="mdi-close-circle"
+                                              label="Text"
+                                              model-value="This is clearable text."
+                                              clearable
+                                              counter="325"
+                                              required
+                                              placeholder="Votre message"
+                                              v-model="this.clickMessage.message"
+                                              :rules="[
+                                              () => !!this.clickMessage.message || 'This field is required',
+                                              () => !!this.clickMessage.message && this.clickMessage.message.length <= 325 || 'Message must be less than 325 characters',
+                                                      messageCheck
+                                                  ]"
+                                          ></v-textarea>
+
+                                          <v-chip-group
+                                                variant="flat"
+                                                mandatory
+                                              >
+                                                <v-chip 
+                                                v-for='file in this.clickMessage.files ' :key="file"
+                                                v-model="this.clickMessage.files"
+                                                  class="me-2"
+                                                  color="deep-purple-accent-4"
+                                                  size="small"
+                                                  label> Filename: {{ file.path}}
+                                                </v-chip>
+                                            </v-chip-group>
+
+                               
+                                      </v-card-text>
+  
+                                      <v-divider class="mt-2"></v-divider>
+  
+                                      <v-card-actions class="my-2 d-flex justify-end">
+                                        <v-btn
+                                          class="text-none"
+                                          rounded="xl"
+                                          text="Cancel"
+                                          @click="isActive.value = false"
+                                        ></v-btn>
+  
+                                        <v-btn
+                                          class="text-none"
+                                          color="primary"
+                                          rounded="xl"
+                                          text="Send"
+                                          variant="flat"
+                                          @click="ShareMessage(isActive)"
+                                        ></v-btn>
+                                      </v-card-actions>
+                                    </v-card>
+                                  </template>
+                                </v-dialog>
+                              </v-btn>
+  
+                              
+  
+  
+  
+                              <!-- Delete -->
+                                    <v-dialog
+                                      transition="dialog-bottom-transition" 
+                                      width='auto'                              
+                                    >
+                                      <template v-slot:activator="{ props: activatorProps }">
+                                        <v-btn
+                                        v-bind="activatorProps"   
+                                      @click= "SelectMessage(Message)"                              
+                                         color="red" > Delete
+                                          <v-icon icon="mdi-delete-outline"></v-icon> 
+                                       </v-btn>
+                                    </template>
+  
+                                    <template v-slot:default="{ isActive }">
+                                      <v-card>
+                                        <v-toolbar color="red" title="Delete"> <v-icon icon="mdi-delete-outline" start ></v-icon> </v-toolbar>
+  
+                                        <v-card-text class="text-h2 pa-12">
+                                          Would you like delete {{clickMessage.id}}?
+                                        </v-card-text>
+  
+                                        <v-card-actions class="justify-end">
+                                          <v-btn
+                                            text="Yes"
+                                            @click="isActive.value = false"
+                                          ></v-btn>
+                                          <v-btn
+                                            text="No"
+                                            @click="DeleteMessage()"
+                                          ></v-btn>
+                                        </v-card-actions>
+                                      </v-card>
+                                    </template>
+                                  </v-dialog>
+                          </div>
+                    </v-list-item>
 
                   <v-divider
 
@@ -890,23 +988,15 @@
               </v-card>
             </v-col>
           </v-row>
-        
-     
-         
-        
-
-   
     </v-container>   
-
-       
-     
+ 
    </template>
    
 
-   
    <script>
     import axios from '../../plugins/axios' 
      export default {
+       name:'admininbox',
        data: () => ({
         isReplyOpen:false,
         isDialogOpen:false,
@@ -937,7 +1027,7 @@
             Statut:null,
             messagereply:null,
         
-         
+          ReplyCount:{},
           Reply:[],
           Messages:[],
           UserConnectedId:null,
@@ -958,7 +1048,8 @@
             this.UserConnectedId = localStorage.getItem("user-info-id")
              this.UserConnected = localStorage.getItem("user-info");
              this.UserConnectedService = localStorage.getItem("user-info-service");
-             this.GetMessages();
+              this.GetMessages();
+        
              this.GetUser();
              this.GetService();
         
@@ -966,7 +1057,10 @@
       created() {
           this.getTodayDate();
           this.getYesterdayDate();
-          this.subscriberMercure();
+      
+          //this.replyMessage();
+      
+
          
              },
      methods: {
@@ -988,7 +1082,21 @@
            const formData = new FormData();
            formData.append("service",this.UserConnectedService);  
            const response = await axios.post('/itemgetmessage', formData);
-            this.Messages = response.data;               
+            this.Messages = response.data;       
+
+            for (const message of this.Messages) {
+          //const replyCountResponse = await axios.get(`/getReplyCount/${message.id}`);
+         // this.$set(this.ReplyCounts, message.id, replyCountResponse.data.count);
+
+          const formData = new FormData();
+           formData.append("message",message.id);  
+           const replyCountResponse = await axios.post('/getreply', formData);
+            const Count =  replyCountResponse.data.length;
+            this.ReplyCounts = { ...this.ReplyCounts, [message.id]: replyCountResponse.data.length };
+
+            
+        }       
+
            console.log(this.Messages);
            this.groupMessagesByDate()
        },
@@ -1043,6 +1151,8 @@
            formData.append("message",Message.id);  
            const response = await axios.post('/getreply', formData);
             this.Reply = response.data; 
+            this.ReplyCount =  response.data.length;
+            console.log("message reply:" , this.ReplyCount);
              console.log("message reply:" , this.Reply);
     },
        SelectMessage(Message){
@@ -1152,7 +1262,8 @@
             return {
               title: User.name,
               subtitle: User.id,
-            }},
+            }
+           },
         messageCheck () {
             this.errorMessages = !this.message
               ? `Hey! I'm required`
