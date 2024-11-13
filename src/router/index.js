@@ -39,6 +39,8 @@ const router = createRouter({
             { path: 'history',name: "adminhistory", component: () => import('@/components/admin/History.vue') },
             { path: 'user',name: "adminuser", component: () => import('@/components/admin/User.vue') },
             { path: 'envoyer',name: "adminenvoyer", component: () => import('@/components/admin/Envoyer.vue') },
+            { path: 'boite',name: "adminboite", component: () => import('@/components/admin/Boite.vue') },
+            { path: 'notification',name: "adminnotif", component: () => import('@/components/admin/Notification.vue') },
           ],
         },
         {
@@ -50,6 +52,9 @@ const router = createRouter({
             { path: 'Uinbox',name: "userinbox", component: () => import('@/components/user/Inbox.vue') },
             { path: 'Uhistory',name: "userhistory", component: () => import('@/components/user/History.vue') },
             { path: 'Uuser',name: "useruser", component: () => import('@/components/user/User.vue') },
+            { path: 'Uenvoyer',name: "userenvoyer", component: () => import('@/components/user/Envoyer.vue') },
+            { path: 'Unotification',name: "usernotif", component: () => import('@/components/user/Notification.vue') },
+       
           ],
         },
         {

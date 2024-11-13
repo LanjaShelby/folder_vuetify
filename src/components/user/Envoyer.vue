@@ -1100,7 +1100,7 @@
       async  GetMessages(){
            const formData = new FormData();
            formData.append("service",this.UserConnectedService);  
-           const response = await axios.post('/itemsendmessage', formData);
+           const response = await axios.post('/usersendmessage', formData);
             this.Messages = response.data;               
            console.log(this.Messages);
            this.groupMessagesByDate()
@@ -1137,19 +1137,26 @@
           
       },
       async DeleteMessage(isActive){
-    isActive.value = false;
-    console.log(this.clickMessage);
-    const response = await axios.delete(`/messagess/${this.clickMessage.id}`, {        
+      isActive.value = false;
+      console.log(this.clickMessage);
+      const response = await axios.patch(`/messagess/${this.clickMessage.id}`, {     
+          delete: true,
+          deletedBy:this.UserConnectedId
+      }, {
+        headers: {
+          'Content-Type': 'application/merge-patch+json'
+        }
       })
-            
-        .then(response => {
-          console.log('Mise à jour réussie:', response.data);
-        })
-        .catch(error => {
-          console.error('Erreur lors de la mise à jour:', error.response.data);
-        });
- 
-  },
+              
+          .then(response => {
+            console.log('Mise à jour réussie:', response.data);
+            console.log('Mise à jour réussie:',this.UserConnected);
+          })
+          .catch(error => {
+            console.error('Erreur lors de la mise à jour:', error.response.data);
+          });
+   
+    },
       async ShareMessage(isActive){
       
         console.log(this.clickMessage);

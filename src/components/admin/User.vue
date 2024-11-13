@@ -18,7 +18,7 @@
   
         <v-spacer></v-spacer>
 
-        <v-btn color="primary" @click="fetchData">Rafraîchir</v-btn>
+        <!-- <v-btn color="primary" @click="fetchData(serviceId)">Rafraîchir</v-btn> -->
 
      
 <v-dialog>
@@ -220,7 +220,7 @@
 
                         <v-list-item
                           prepend-icon="mdi-map-marker"
-                        ><p>{{clickItem.service.libelle_service}}</p></v-list-item>
+                        ><p>{{clickItem.service}}</p></v-list-item>
                       </v-list>
 
                       <v-img
@@ -353,8 +353,8 @@
       this.serviceuser = serviceId;
       this.fetchData(serviceId);
       this.GetUserAdd();
-      
-      console.log("serviceid" ,serviceId);
+      //this.subscribe();
+    //  console.log("serviceid" ,serviceId);
     },
     methods:{
 
@@ -367,6 +367,28 @@
         console.log("id " ,this.UserConnectedService);
         const response = await axios.post('/userr',formdata); // Remplace par ton endpoint
         this.items = response.data;
+        const hubUrl = 'http://localhost:8001/.well-known/mercure';
+         const topicUrl = 'http://127.0.0.1:8000/api/userr/{id}';
+          const es = new EventSource(`${hubUrl}?topic=${encodeURIComponent(topicUrl)}`);
+
+    es.onmessage = event => {
+      const updatedUser = JSON.parse(event.data);
+
+      this.items = this.items.map(user =>
+        user.id === updatedUser.id ? updatedUser : user
+      );}
+
+
+
+        // // const hubUrl = response.headers.link.match(/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/)[1]; // the autodiscovery mechanism
+        // const hubUrl = 'http://localhost:8001/.well-known/mercure'; // what's currently in the demo project
+        // const es = new EventSource(`${hubUrl}?topic=127.0.0.1:8000/api/userr/{id}`);
+        // es.onmessage = ({data}) => {
+        //   const responseuser = JSON.parse(data);
+        //   console.log("mercure", responseuser);
+        // }
+   
+      // console.log(response)
          // Récupérer la liste des utilisateurs
       } catch (error) {
         console.error('Erreur lors de la récupération des données:', error);
@@ -374,6 +396,17 @@
         this.loading = false;
       }
     },
+    
+    subscribe() {
+  const hubUrl = 'http://localhost:8001/.well-known/mercure';
+  const eventSource = new EventSource(`${hubUrl}?topic=http://127.0.0.1:8000/api/userr/{id}`);
+  eventSource.onmessage = event => {
+    const user = (JSON).parse(event.data);
+    console.log(user);
+  }
+},
+
+
     async SetAdmin(item) {
         const response = await axios.patch(`/userss/${item.id}`, {  
                           roles: ["ROLE_ADMIN"]
@@ -412,6 +445,7 @@
     viewProfil(item) {
       this.dialogProfil = true
       this.clickItem = item;
+   
     },
     async EditUser(){
       console.log(this.clickItem)
@@ -447,8 +481,6 @@
       async GetUserAdd(){
         const response = await axios.get('/userall');
         this.user = response.data;
-    
-          console.log("user at user:", this.user);
          ;
        },
        async Register(){

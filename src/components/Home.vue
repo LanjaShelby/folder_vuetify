@@ -331,11 +331,13 @@
 
   const cards = ['Today', 'Yesterday']
   const links = [
-    ['mdi-inbox-arrow-down', 'Inbox' ,'/admin/inbox'],
-    ['mdi-send', 'Send' , '/admin/send'],
-    ['mdi-timeline-text-outline', 'History' ,'/admin/history'],
     ['mdi-account-circle-outline', 'User' ,'/admin/user'],
-    ['mdi-account-circle-outline', 'Envoyer' ,'/admin/envoyer'],
+    ['mdi-account-circle-outline', 'Notification' ,'/admin/notification'],
+    ['mdi-send', 'New Message' , '/admin/send'],  
+    ['mdi-account-circle-outline', 'Send' ,'/admin/envoyer'],
+    ['mdi-inbox-arrow-down', 'Inbox' ,'/admin/inbox'],
+    ['mdi-timeline-text-outline', 'History' ,'/admin/history'],
+// ['mdi-account-circle-outline', 'Boite' ,'/admin/boite'],
    
   ]
 

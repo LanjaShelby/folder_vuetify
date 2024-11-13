@@ -336,7 +336,7 @@
       cols="12"
       lg="6"
       md="8"
-      sm="10"
+      sm="20"
     >
       <v-card ref="form">
         <v-card-text>
@@ -424,17 +424,12 @@
             </v-file-input>
            
 </v-card-text>
-<v-alert
-    v-if="errorMessages != '' "
-    density="compact"
-    :title="errorMessages"
-    type="warning"
-  ></v-alert>
+ 
         <v-divider class="mt-12"></v-divider>
 <v-card-actions>
           <v-btn 
           variant="text"
-          @click="resetForm"
+          @click="cancel"
          >
             Cancel
           </v-btn>
@@ -448,6 +443,109 @@
             Submit
           </v-btn>
         </v-card-actions>
+        <v-dialog
+                                  v-model="isSuccess"> 
+                                      <v-sheet
+                                    
+                                        class="pa-4 text-center mx-auto"
+                                        elevation="12"
+                                        max-width="600"
+                                        rounded="lg"
+                                        width="100%"
+                                      >
+                                        <v-icon
+                                          class="mb-5"
+                                          color="success"
+                                          icon="mdi-check-circle"
+                                          size="112"
+                                        ></v-icon>
+
+                                        <h2 class="text-h5 mb-6">This message was sent</h2>
+
+                                        <!-- <p class="mb-4 text-medium-emphasis text-body-2">
+                                          To see a report on this reconciliation, click <a class="text-decoration-none text-info" href="#">View reconciliation report.</a>
+
+                                          <br>
+
+                                          Otherwise, you're done!
+                                        </p> -->
+
+                                        <v-divider class="mb-4"></v-divider>
+
+                                        <div class="text-end">
+                                          <v-btn
+                                            class="text-none"
+                                            color="success"
+                                            variant="flat"
+                                            width="90"
+                                            rounded
+                                            @click="isSuccess=false"
+                                          >
+                                            Done
+                                          </v-btn>
+                                        </div>
+                                </v-sheet>
+                              </v-dialog>
+          
+                              <v-dialog
+                                  v-model="isFailed"> 
+                                      <v-sheet
+                                    
+                                        class="pa-4 text-center mx-auto"
+                                        elevation="12"
+                                        max-width="600"
+                                        rounded="lg"
+                                        width="100%"
+                                      >
+                                        <v-icon
+                                          class="mb-5"
+                                          color="red"
+                                          icon="mdi mdi-alert-circle-outline"
+                                          size="112"
+                                        ></v-icon>
+
+                                        <h2 class="text-h5 mb-6">Send message failed</h2>
+                                        <br>
+                                        <p 
+                                             v-if="errorMessages != '' ">
+                                             {{errorMessages}}
+
+                                          </p>
+                                          <p 
+                                             v-if="IncompletMessage!= '' ">
+                                             {{IncompletMessage }}
+
+                                          </p>
+                                          <br>
+
+                                        <p class="mb-4 text-medium-emphasis text-body-2">
+                                        Please check the message and try again
+
+                                          <br>
+
+                                          If the problem persists contact the administrator at your service level
+                                        </p>
+                                          
+
+                                       
+                                        <v-divider class="mb-4"></v-divider>
+
+                                        <div class="text-end">
+                                          <v-btn
+                                            class="text-none"
+                                            color="red"
+                                            variant="flat"
+                                            width="90"
+                                            rounded
+                                            @click="isFailed=false"
+                                          >
+                                            Done
+                                          </v-btn>
+                                        </div>
+                                </v-sheet>
+                              </v-dialog>
+                              
+                            
       </v-card>
     </v-col>
   </v-row>
@@ -475,6 +573,8 @@
     import axios from '../../plugins/axios' 
      export default {
        data: () => ({
+        isSuccess:false,
+        isFailed:false,
         select:"",
         selectService:"",
          cards: ['Today', 'Yesterday'],
@@ -487,6 +587,7 @@
           files: [],
           message:null,
           errorMessages: '',
+          IncompletMessage : '',
           formHasErrors: false,
           selectedUser:"",
           ServiceOptions:[],
@@ -504,6 +605,7 @@
               message: this.message,
               title: this.Objet,
               files:this.files
+             
             }
             },
           
@@ -559,20 +661,26 @@
 
                 return true
         },
+        cancel(){
+          this.errorMessages = null;
+          this.IncompletMessage = null;
+        this.resetForm();
+      },
         resetForm () {
-                this.errorMessages = "";
-            
-                Object.keys(this.form).forEach(f  => {
-                  this.$ref[f].reset()
-              })
+             
+                      this.message = null;
+                      this.Objet = null;
+                      this.files = [];
         },
         async submit () {
+         
                   console.log(this.form)
                 try
                 { this.formHasErrors = false
                   for (let f in this.form) {
                           if (!this.form[f]) {
-                            this.errorMessages = "Formulaire error";
+                            this.IncompletMessage = "Warning, Please complete the empty fields";
+                            this.isFailed=true;
                             this.formHasErrors = true;
                             break; 
                           }
@@ -594,13 +702,22 @@
                   .then((response) => {
                       // Gérer la réponse de succès
                       console.log('Success:', response.data);
+                      this.isSuccess= true;
+                      this.recipient = null;
+                      this.message = null;
+                      this.Objet = null;
+                      this.files = [];
                     })
                     .catch((error) => {
                       // Gérer l'erreur
                       if (error.response) {
                         console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                        this.isFailed= true;
+                        this.errorMessages =   error.response.data;
                       } else {
                         console.error('Erreur lors de l\'envoi:', error.message);
+                        this.isFailed = true;
+                        this.errorMessages =   eerror.message;
                       }  });
 
       
@@ -612,12 +729,15 @@
                       if (error.response) {
                           // Le serveur a répondu avec un code d'erreur (ex: 400, 500)
                           console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                          this.isFailed= true;
                         } else if (error.request) {
                           // La requête a été envoyée mais aucune réponse n'a été reçue
                           console.error('Erreur lors de l\'envoi - Aucune réponse reçue :', error.request);
+                          this.isFailed= true;
                         } else {
                           // Quelque chose d'autre a provoqué l'erreur
                           console.error('Erreur lors de l\'envoi', error.message);
+                          this.isFailed= true;
                         }
                     }
                   

@@ -316,11 +316,18 @@
 
   const cards = ['Today', 'Yesterday']
   const links = [
-    ['mdi-inbox-arrow-down', 'Inbox' ,'/user/Uinbox'],
-    ['mdi-send', 'Send' , '/user/Usend'],
-    ['mdi-timeline-text-outline', 'History' ,'/user/Uhistory'],
-    ['mdi-account-circle-outline', 'User' ,'/user/Uuser'],
+    // ['mdi-inbox-arrow-down', 'Inbox' ,'/user/Uinbox'],
+    // ['mdi-send', 'Send' , '/user/Usend'],
+    // ['mdi-timeline-text-outline', 'History' ,'/user/Uhistory'],
+    // ['mdi-account-circle-outline', 'User' ,'/user/Uuser'],
    
+
+    ['mdi-account-circle-outline', 'User' ,'/user/Uuser'],
+    ['mdi-account-circle-outline', 'Notification' ,'/user/Unotification'],
+    ['mdi-send', 'New Message' , '/user/Usend'],  
+    ['mdi-account-circle-outline', 'Send' ,'/user/Uenvoyer'],
+    ['mdi-inbox-arrow-down', 'Inbox' ,'/user/Uinbox'],
+    ['mdi-timeline-text-outline', 'History' ,'/user/Uhistory'],
   ]
 
   const drawer = ref(null)
