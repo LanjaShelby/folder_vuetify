@@ -62,6 +62,8 @@ const router = createRouter({
           component: HomeLogin, // Utilise le HomeLogin pour cette route
           children: [
             { path: '',name: "login", component: () => import('@/components/login/Loginn.vue') },
+            { path: 'regiister',name: "regiister", component: () => import('@/components/login/Register.vue') },
+          
           ],
         },
         {

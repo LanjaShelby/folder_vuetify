@@ -4,6 +4,7 @@
   <v-card class="py-8 px-6" >
 <v-card-title class="text-h6 font-weight-bold">Notifications</v-card-title>
 <v-divider></v-divider>
+
 <v-divider></v-divider>
 
 <v-list two-line>

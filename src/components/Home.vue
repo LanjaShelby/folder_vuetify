@@ -219,17 +219,19 @@
         color="#1569C7"
         style="cursor: pointer"  
       >
-      <div
+      <div class="d-flex flex-row"
       @click="dialog = !dialog">
-        <v-avatar class="mb-4" size="64" >
-          <v-img alt="Avatar" :src="getImageUrl(UserConnected.image)" ></v-img>
+       <div >
+      <v-avatar class="mb" size="84" >
+          <v-img alt="Avatar" src="http://127.0.0.1:8000/files/logo_dgsr.png" ></v-img>
       </v-avatar>
-        
-   
-
-      <div>  <v-chip color="secondary" variant="flat">  <v-icon icon="mdi-account-circle-outline" start> </v-icon> {{UserConnected.name}}  </v-chip></div>
-      </div>
-      
+      <v-img alt="Avatar" class="mt-2" width="90" src="http://127.0.0.1:8000/files/DGSR.png" ></v-img>
+    </div>
+    <v-img alt="Avatar" class="mb-" width="150" src="http://127.0.0.1:8000/files/share.png" ></v-img>
+  </div> 
+      <!-- <div>  <v-chip color="secondary" variant="flat">  <v-icon icon="mdi-account-circle-outline" start> </v-icon> {{UserConnected.name}}  </v-chip></div>
+       -->
+      <!--
     <v-fade-transition hide-on-leave>
       <v-card
         v-if=dialog
@@ -261,7 +263,7 @@
         </div>
 
         <v-divider></v-divider>
-<!--
+
         <div class="pa-4 text-end">
           <v-btn
             class="text-none"
@@ -281,10 +283,10 @@
           :title="text"
           :to="route"
           link
-        ></v-list-item>-->
+        ></v-list-item>
       </v-card>
     </v-fade-transition>
-       
+  -->
       </v-sheet>
 
       <v-divider></v-divider>
@@ -302,6 +304,8 @@
           variant="tonal" 
            block></v-btn>
         </v-list-item>
+       
+           
         
      
         <div class="pa-4 text-end">
@@ -309,6 +313,8 @@
         
         </div>
       </v-list>
+      <v-divider></v-divider>
+     
     </v-navigation-drawer>
 
     <v-main 
@@ -340,6 +346,11 @@
 // ['mdi-account-circle-outline', 'Boite' ,'/admin/boite'],
    
   ]
+  const items = ref([
+        {  title: '  Réçu' , route: '/admin/notification' },
+        { title: 'Suivi', route: '/admin/envoyer'},
+
+  ])
 
   const drawer = ref(null)
   //const dialog = ref(false) 
@@ -452,6 +463,9 @@ eventSource.onmessage = event => {
 .slide-left-leave, .slide-left-enter-to {
   /* Termine la transition sur la droite */
   transform: translateX(100%);
+}
+.v-list-item {
+  cursor: pointer;
 }
 </style>
 
