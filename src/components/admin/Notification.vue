@@ -82,12 +82,7 @@ this.notification = response.data;
 console.log(this.notification);     
 
 },
-//  async GetNotif(){
-//   const response = await axios.get('/notifications');
-//         this.notification = response.data['hydra:member'];  
-//         console.log(this.notification);     
 
-//  },
 relativeTime(dateTimeISO) {
 // Transforme la chaîne ISO en objet Date et calcule le temps écoulé
 return formatDistanceToNow(new Date(dateTimeISO), { addSuffix: true, locale: fr });

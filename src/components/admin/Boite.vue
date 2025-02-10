@@ -44,13 +44,7 @@
                             </span>
 
                         </p>
-                           <!-- <h1 class="text-overline">
-                            <span class="text-decoration-underline" >From Service</span> : {{Message.senderService}}
-                          </h1>
-                     
-                         <h1 class="text-overline">
-                        <span class="text-decoration-underline" >Subject</span> : {{Message.title}}
-                          </h1> -->
+                          
                          <p  class="d-inline-flex align-items-center"> 
                             <h1 class="text-overline">
                              <span class="text-decoration-underline" >Subject</span> : {{Message.title}}
@@ -79,18 +73,7 @@
                             </v-btn> 
                            
 
-                          <!--   <v-chip-group
-                            variant="flat"
-                            mandatory
-                          >
-                             <v-chip 
-                             v-for='file in Message.files ' :key="file"
-                              class="me-2"
-                              color="deep-purple-accent-4"
-                              size="small"
-                              label> Filename: {{ file.path}}
-                            </v-chip>
-                         </v-chip-group>
+                          <!--   
 
                         CONTENT MESSAGE -->
                         <v-dialog
@@ -585,18 +568,7 @@
                            
                            
 
-                          <!--   <v-chip-group
-                            variant="flat"
-                            mandatory
-                          >
-                             <v-chip 
-                             v-for='file in Message.files ' :key="file"
-                              class="me-2"
-                              color="deep-purple-accent-4"
-                              size="small"
-                              label> Filename: {{ file.path}}
-                            </v-chip>
-                         </v-chip-group>
+                          <!--   
 
                         CONTENT MESSAGE -->
                         <v-dialog

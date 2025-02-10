@@ -99,7 +99,7 @@
                   console.log('Données envoyées avec succès', response.data);
                   this.user = response.data;
                           console.log(this.user);
-                          this.$router.push({name:"inbox"})
+                          this.$router.push({name:"user"})
                         console.log('Success:', response.data)
                    
                 

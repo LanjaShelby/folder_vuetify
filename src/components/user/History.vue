@@ -20,46 +20,7 @@
               <v-list-subheader :title="card" ></v-list-subheader>
 
               <template v-for="Message in Messages" :key="Message">
-                        <!-- <v-list-item
-                        @click="openDialog(Message)"
-                        :class="{'unread-message': !Message.is_read, 'read-message': Message.is_read}"
-
-
-                        >
-                          <template v-slot:prepend>
-                            <v-avatar size="x-large" > <v-icon icon="mdi-account-circle"></v-icon></v-avatar>
-                          </template>
-                          <h1 class="text-overline">
-                            Service: {{Message.recipient_service.libelle_name}}
-                              </h1>
-                            <p class="font-weight-medium">
-                              {{Message.sender.name}} to {{Message.recipientName}} @   <span class="font-weight-light"> {{Message.created_at}} </span>
-                              </p>
-                        
-                            <h1 class="text-overline">
-                            Subject: {{Message.title}}
-                              </h1>
-                            
-                            <v-chip color="secondary" variant="flat">
-                          {{Message.files.length}} Files
-                              </v-chip> <br>
-                              <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" /> <v-icon :icon="Message.is_read ? 'mdi mdi-check-circle-outline' : 'mdi mdi-check-circle'" /> -->
-
-
-                              <!--   <v-chip-group
-                                variant="flat"
-                                mandatory
-                              >
-                                <v-chip 
-                                v-for='file in Message.files ' :key="file"
-                                  class="me-2"
-                                  color="deep-purple-accent-4"
-                                  size="small"
-                                  label> Filename: {{ file.path}}
-                                </v-chip>
-                            </v-chip-group>
-
-                          -->
+                      
 
 
                           <v-list-item
@@ -89,13 +50,7 @@
                           </span>
 
                       </p>
-                         <!-- <h1 class="text-overline">
-                          <span class="text-decoration-underline" >From Service</span> : {{Message.senderService}}
-                        </h1>
-                   
-                       <h1 class="text-overline">
-                      <span class="text-decoration-underline" >Subject</span> : {{Message.title}}
-                        </h1> -->
+                        
                        <p  class="d-inline-flex align-items-center"> 
                           <h1 class="text-overline">
                            <span class="text-decoration-underline" >Subject</span> : {{Message.title}}
@@ -124,18 +79,7 @@
                           </v-btn> 
                          
 
-                        <!--   <v-chip-group
-                          variant="flat"
-                          mandatory
-                        >
-                           <v-chip 
-                           v-for='file in Message.files ' :key="file"
-                            class="me-2"
-                            color="deep-purple-accent-4"
-                            size="small"
-                            label> Filename: {{ file.path}}
-                          </v-chip>
-                       </v-chip-group>
+                        <!--  
 
                       CONTENT MESSAGE -->
                       <v-dialog
@@ -901,40 +845,4 @@ this.yesterdayMessages = this.Messages.filter(msg => {
      transform: translateX(100%);
    }
    </style>
-    <!-- <v-system-bar>
-      
-       <v-icon>mdi-square</v-icon>
- 
-       <v-icon>mdi-circle</v-icon>
- 
-       <v-icon>mdi-triangle</v-icon>
-     </v-system-bar> 
- 
-     <v-navigation-drawer v-model="drawer">
-       <v-sheet
-         class="pa-4"
-         color="#1569C7"
-       >
-         <v-avatar
-           class="mb-4"
-           color="grey-darken-1"
-           size="64"
-         ></v-avatar>
- 
-         <div>john@google.com</div>
-       </v-sheet>
- 
-       <v-divider></v-divider>
-    
-       <v-list>
-         <v-list-item
-           v-for="[icon, text] in links"
-           :key="icon"
-           :prepend-icon="icon"
-           :title="text"
-           link
-         ></v-list-item>
-       </v-list>
    
- 
-     </v-navigation-drawer>-->

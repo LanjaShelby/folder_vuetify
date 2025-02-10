@@ -1,55 +1,77 @@
 <template>
-  <v-container fluid fill-height>
-    <v-layout align-center justify-center>
-      <v-flex xs12 sm8 md3>
-        <v-card>
-          <v-toolbar color="primary" :dark="true">
-            <v-toolbar-title>Login</v-toolbar-title>
-          </v-toolbar>
-          <v-card-text>
-            <v-form>
-              <v-text-field prepend-icon="person" type="text" v-model="user.email" label="E-mail"></v-text-field>
-              <v-text-field
-                prepend-icon="lock"
-                type="password"
-                v-model="user.password"
-                label="Senha"
-              ></v-text-field>
-            </v-form>
-             <v-alert type="error" v-if="errorLogin">
-                Usuário ou senha inválidos
-              </v-alert>
-          </v-card-text>
-          <v-card-actions>
-            <div class="flex-grow-1"></div>
-            <v-btn color="primary" @click="login">Login</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-    </v-layout>
+  <v-container fluid class="d-flex justify-center align-center" style="height: 100vh; background-color: #f5f5f5">
+    <v-row align ="center" justify="center" class="elevation-4" style="width: 80%; max-height: 500px; background-color: white;">
+      <!-- Section de gauche avec l'image -->
+      <v-col cols="12" md="6" class="d-flex align-center justify-center" style="background-color: #4caf50;">
+        <v-img
+          src="https://via.placeholder.com/400x400?text=Login+Image"
+          alt="Login Illustration"
+          contain
+          style="width: 80%; max-height: 300px"
+        ></v-img>
+      </v-col>
+      <!-- Section de droite avec le formulaire -->
+      <v-col cols="12" md="6" class="pa-10">
+        <h2 class="text-center mb-6">Connexion</h2>
+        <v-form ref="form" v-model="valid">
+          <v-text-field
+            v-model="email"
+            label="Adresse e-mail"
+            type="email"
+            outlined
+            :rules="[rules.required, rules.email]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="password"
+            label="Mot de passe"
+            type="password"
+            outlined
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+          <v-btn :disabled="!valid" color="primary" block class="mt-6" @click="login">
+            Se connecter
+          </v-btn>
+          <p class="text-center mt-4">
+            <a href="#" class="text-decoration-none">Mot de passe oublié ?</a>
+          </p>
+        </v-form>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
+
 <script>
-//import { AUTH_REQUEST } from "@/js/store/types/auth";
 export default {
-  name: "Login",
   data() {
     return {
-      errorLogin: false,
-      user: {}
+      email: "",
+      password: "",
+      valid: false,
+      rules: {
+        required: (value) => !!value || "Ce champ est requis.",
+        email: (value) => {
+          const pattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+          return pattern.test(value) || "Adresse e-mail invalide.";
+        },
+      },
     };
   },
   methods: {
     login() {
-      this.errorLogin = false
-         this.$store.dispatch(`auth/${AUTH_REQUEST}`, this.user)
-        .then(() => {
-          this.$router.push('/');
-        }).catch(() => {
-          this.errorLogin = true
-        });
-        // this.loading = false
-    }
-  }
+      if (this.$refs.form.validate()) {
+        console.log("Email:", this.email);
+        console.log("Password:", this.password);
+        alert("Connexion réussie !");
+      }
+    },
+  },
 };
 </script>
+
+<style scoped>
+a {
+  color: #4caf50;
+}
+</style>

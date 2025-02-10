@@ -105,6 +105,105 @@
         </v-dialog>
 
 
+        <v-dialog
+                                  v-model="isSuccess"> 
+                                      <v-sheet
+                                    
+                                        class="pa-4 text-center mx-auto"
+                                        elevation="12"
+                                        max-width="600"
+                                        rounded="lg"
+                                        width="100%"
+                                      >
+                                        <v-icon
+                                          class="mb-5"
+                                          color="success"
+                                          icon="mdi-check-circle"
+                                          size="112"
+                                        ></v-icon>
+
+                                        <h2 class="text-h5 mb-6">Registration completed successfully</h2>
+
+                                  
+
+                                        <v-divider class="mb-4"></v-divider>
+
+                                        <div class="text-end">
+                                          <v-btn
+                                            class="text-none"
+                                            color="success"
+                                            variant="flat"
+                                            width="90"
+                                            rounded
+                                            @click="isSuccess=false"
+                                          >
+                                            Done
+                                          </v-btn>
+                                        </div>
+                                </v-sheet>
+              </v-dialog>
+
+
+                         
+                              <v-dialog
+                                  v-model="isFailed"> 
+                                      <v-sheet
+                                    
+                                        class="pa-4 text-center mx-auto"
+                                        elevation="12"
+                                        max-width="600"
+                                        rounded="lg"
+                                        width="100%"
+                                      >
+                                        <v-icon
+                                          class="mb-5"
+                                          color="red"
+                                          icon="mdi mdi-alert-circle-outline"
+                                          size="112"
+                                        ></v-icon>
+
+                                        <h2 class="text-h5 mb-6">Registration failed</h2>
+                                        <br>
+                                        <p 
+                                             v-if="errorMessages != '' ">
+                                             {{errorMessages}}
+
+                                          </p>
+                                          <p 
+                                             v-if="IncompletMessage!= '' ">
+                                             {{IncompletMessage }}
+
+                                          </p>
+                                          <br>
+
+                                        <p class="mb-4 text-medium-emphasis text-body-2">
+                                        Please check the message and try again
+
+                                          <br>
+
+                                          If the problem persists contact the administrator at your service level
+                                        </p>
+                                          
+
+                                       
+                                        <v-divider class="mb-4"></v-divider>
+
+                                        <div class="text-end">
+                                          <v-btn
+                                            class="text-none"
+                                            color="red"
+                                            variant="flat"
+                                            width="90"
+                                            rounded
+                                            @click="isFailed=false"
+                                          >
+                                            Done
+                                          </v-btn>
+                                        </div>
+                                </v-sheet>
+                              </v-dialog>
+
+
         <v-text-field
           v-model="search"
           density="compact"
@@ -297,6 +396,8 @@
   export default {
     data () {
       return {
+      isSuccess:false,
+      isFailed : false,
       user:[],
       search: '',
       items: [], // Les données récupérées
@@ -367,7 +468,7 @@
         console.log("id " ,this.UserConnectedService);
         const response = await axios.post('/userr',formdata); // Remplace par ton endpoint
         this.items = response.data;
-        const hubUrl = 'http://localhost:8001/.well-known/mercure';
+       /* const hubUrl = 'http://localhost:8001/.well-known/mercure';
          const topicUrl = 'http://127.0.0.1:8000/api/userr/{id}';
           const es = new EventSource(`${hubUrl}?topic=${encodeURIComponent(topicUrl)}`);
 
@@ -377,7 +478,7 @@
       this.items = this.items.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       );}
-
+*/
 
 
         // // const hubUrl = response.headers.link.match(/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/)[1]; // the autodiscovery mechanism
@@ -397,14 +498,7 @@
       }
     },
     
-    subscribe() {
-  const hubUrl = 'http://localhost:8001/.well-known/mercure';
-  const eventSource = new EventSource(`${hubUrl}?topic=http://127.0.0.1:8000/api/userr/{id}`);
-  eventSource.onmessage = event => {
-    const user = (JSON).parse(event.data);
-    console.log(user);
-  }
-},
+   
 
 
     async SetAdmin(item) {
@@ -513,14 +607,42 @@
            const response = await axios.post("/register", formData)
             .then((response) => {
               // Gérer la réponse de succès
-              console.log("Success");
+              
+                    this.register.name ="";
+                    this.register.email="";
+                    this.register.password="";
+                    this.register.roles="";
+                    this.register.fonction="";
+                    this.register.phone="";
+                    this.register.files ="";
+              this.isSuccess=true;
+              console.log("Success send mail" , response.data);
             })
             .catch((error) => {
               // Gérer l'erreur
                   if (error.response) {
                     console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                    this.register.name =null;
+                    this.register.email=null;
+                    this.register.password=null;
+                    this.register.roles=null;
+                    this.register.fonction=null;
+                    this.register.phone=null;
+                    this.register.files =null;
+                    this.isFailed = true;
+                    
+                   this.errorMessages =   "E-mail already exist";
                   } else {
                     console.error('Erreur lors de l\'envoi:', error.message);
+                    this.register.name =null;
+                    this.register.email=null;
+                    this.register.password=null;
+                    this.register.roles=null;
+                    this.register.fonction=null;
+                    this.register.phone=null;
+                    this.register.files =null;
+                    this.isSuccess=true;
+                   this.errorMessages =   error.message;
                   }  
             });
               

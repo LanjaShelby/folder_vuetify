@@ -1,7 +1,21 @@
 <template>
   <v-app id="inspire">
 
-    <div class="text-right">
+  
+    
+   <!-- <v-card
+    class="mx-auto"
+    max-width="344"
+    max-height="100"
+  
+    title="Disabled card"
+    disabled
+    link
+    
+  ></v-card> -->
+  
+    <div class="text-right position">
+    
       <v-icon > mdi mdi-message-badge-outline </v-icon>
     <v-menu
       v-model="menu"
@@ -43,15 +57,16 @@
 
         <v-list>
           <v-list-item>
-                <v-btn
-              color="primary"
+            <v-btn
+              color="warning"
               prepend-icon= "mdi-account-circle-outline"
-              text="Vieuw Profil"
+              text="Change password"
               class="text-none"
               variant="outlined"
-                @click="dialogProfil = true"
+                @click="dialogPassword = true"
               flat>  </v-btn>
-     
+
+               
               <v-dialog
                 v-model="dialogProfil"
                 max-width="500"
@@ -108,7 +123,12 @@
 
                         <v-list-item
                           prepend-icon="mdi-map-marker"
-                          :title="UserConnected.service"
+                          :title="userService.libelle_service"
+                        ></v-list-item>
+
+                        <v-list-item
+                          prepend-icon="mdi-map-marker"
+                          :title="userService.secteur"
                         ></v-list-item>
                       </v-list>
 
@@ -177,6 +197,198 @@
 
           </v-list-item>
           <v-list-item>
+            <v-btn
+              color="primary"
+              prepend-icon= "mdi-account-circle-outline"
+              text="Vieuw Profil"
+              class="text-none"
+              variant="outlined"
+                @click="dialogProfil = true"
+              flat>  </v-btn>
+<!--change password -->
+              <v-dialog
+                v-model="dialogPassword"
+          max-width="600"
+              >
+                    <v-card
+                      
+                      max-width="800"
+                      
+                    >
+                      <v-card-item class="bg-cyan-darken-1">
+                        <v-card-title>
+                          <span class="text-h5">{{UserConnected.name}}</span>
+                        </v-card-title>
+
+                        <template v-slot:append>
+                          <v-defaults-provider
+                            :defaults="{
+                              VBtn: {
+                                variant: 'text',
+                                density: 'comfortable',
+                              }
+                            }"
+                          >                        
+                    
+
+                            <v-btn  @click="dialogPassword = false" icon="mdi mdi-close"></v-btn>
+                          </v-defaults-provider>
+                        </template>
+                      </v-card-item>
+
+                      
+  <v-sheet class="pa-4 text-center mx-auto" width="300" >
+
+    <v-form ref="form">
+      <v-text-field
+        v-model="password"
+        :counter="10"
+        :rules="nameRules"
+        label="Password"
+        required
+      ></v-text-field>
+      <v-text-field
+        v-model="password2"
+        :counter="10"
+        :rules="nameRules2"
+        label="Confirmer Password"
+        required
+      ></v-text-field>
+     
+
+
+      <div class="d-flex flex-column">
+        <v-btn
+          class="mt-4"
+          color="success"
+          block
+          @click="validate"
+        >
+          Change password
+        </v-btn>
+
+        <v-btn
+          class="mt-6"
+          color="error"
+          block
+          @click="reset"
+        >
+          Reset Form
+        </v-btn>
+
+        
+      </div>
+    </v-form>
+  </v-sheet>
+
+
+                      
+                    </v-card>              
+             </v-dialog>
+
+
+             <v-dialog
+                                  v-model="isSuccess"> 
+                                      <v-sheet
+                                    
+                                        class="pa-4 text-center mx-auto"
+                                        elevation="12"
+                                        max-width="600"
+                                        rounded="lg"
+                                        width="100%"
+                                      >
+                                        <v-icon
+                                          class="mb-5"
+                                          color="success"
+                                          icon="mdi-check-circle"
+                                          size="112"
+                                        ></v-icon>
+
+                                        <h2 class="text-h5 mb-6">Password changed succesfully</h2>
+
+                                  
+
+                                        <v-divider class="mb-4"></v-divider>
+
+                                        <div class="text-end">
+                                          <v-btn
+                                            class="text-none"
+                                            color="success"
+                                            variant="flat"
+                                            width="90"
+                                            rounded
+                                            @click="isSuccess=false"
+                                          >
+                                            Done
+                                          </v-btn>
+                                        </div>
+                                </v-sheet>
+              </v-dialog>
+
+
+                         
+                              <v-dialog
+                                  v-model="isFailed"> 
+                                      <v-sheet
+                                    
+                                        class="pa-4 text-center mx-auto"
+                                        elevation="12"
+                                        max-width="600"
+                                        rounded="lg"
+                                        width="100%"
+                                      >
+                                        <v-icon
+                                          class="mb-5"
+                                          color="red"
+                                          icon="mdi mdi-alert-circle-outline"
+                                          size="112"
+                                        ></v-icon>
+
+                                        <h2 class="text-h5 mb-6">Password changed failed</h2>
+                                        <br>
+                                        <p 
+                                             v-if="errorMessages != '' ">
+                                             {{errorMessages}}
+
+                                          </p>
+                                          <p 
+                                             v-if="IncompletMessage!= '' ">
+                                             {{IncompletMessage }}
+
+                                          </p>
+                                          <br>
+
+                                        <p class="mb-4 text-medium-emphasis text-body-2">
+                                        Please check the message and try again
+
+                                          <br>
+
+                                          If the problem persists contact the administrator at your service level
+                                        </p>
+                                          
+
+                                       
+                                        <v-divider class="mb-4"></v-divider>
+
+                                        <div class="text-end">
+                                          <v-btn
+                                            class="text-none"
+                                            color="red"
+                                            variant="flat"
+                                            width="90"
+                                            rounded
+                                            @click="isFailed=false"
+                                          >
+                                            Done
+                                          </v-btn>
+                                        </div>
+                                </v-sheet>
+                              </v-dialog>
+     <!--change password -->
+
+
+          </v-list-item>
+          <v-list-item>
               <v-btn
                 @click="Logout"
               color="red"
@@ -202,6 +414,7 @@
       </v-card>
     </v-menu>
   </div>
+
    <!-- <v-system-bar>
       <v-spacer></v-spacer>
 
@@ -223,70 +436,13 @@
       @click="dialog = !dialog">
        <div >
       <v-avatar class="mb" size="84" >
-          <v-img alt="Avatar" src="http://127.0.0.1:8000/files/logo_dgsr.png" ></v-img>
+          <v-img alt="Avatar" src="http://127.0.0.1:8000/files/logo.png" ></v-img>
       </v-avatar>
       <v-img alt="Avatar" class="mt-2" width="90" src="http://127.0.0.1:8000/files/DGSR.png" ></v-img>
     </div>
     <v-img alt="Avatar" class="mb-" width="150" src="http://127.0.0.1:8000/files/share.png" ></v-img>
   </div> 
-      <!-- <div>  <v-chip color="secondary" variant="flat">  <v-icon icon="mdi-account-circle-outline" start> </v-icon> {{UserConnected.name}}  </v-chip></div>
-       -->
-      <!--
-    <v-fade-transition hide-on-leave>
-      <v-card
-        v-if=dialog
-        append-icon="$close"
-        class="mx-auto"
-        elevation="16"
-        max-width="500"
-        title="Profil"
-      >
-        <template v-slot:append>
-          <v-btn icon="$close" variant="text" @click="dialog = false"></v-btn>
-        </template>
-
-        <v-divider></v-divider>
-
-        <div class="py-12 text-center">
-          <v-avatar class="mb-4" size="64" >
-             <v-img alt="Avatar" src="https://cdn.vuetifyjs.com/images/john.jpg" ></v-img>
-      </v-avatar>
-
-              <div class="text-h6 font-weight-bold">
-                <v-btn color="blue"  class="ma-2"  >
-                      <v-icon icon="mdi-account-star-outline" start></v-icon> {{UserConnected.name}}
-                </v-btn>
-                <v-btn class="ma-2" color="red">
-                  <v-icon :icon="UserIcon" start></v-icon>{{UserRole}}
-                  </v-btn>             
-              </div>
-        </div>
-
-        <v-divider></v-divider>
-
-        <div class="pa-4 text-end">
-          <v-btn
-            class="text-none"
-            color="medium-emphasis"
-            min-width="92"
-            variant="outlined"
-            rounded
-            @click="dialog = false"
-          >
-            Close
-          </v-btn>
-        </div> 
-         <v-list-item
-          v-for="[icon, text, route] in links"
-          :key="icon"
-          :prepend-icon="icon"
-          :title="text"
-          :to="route"
-          link
-        ></v-list-item>
-      </v-card>
-    </v-fade-transition>
-  -->
+  
       </v-sheet>
 
       <v-divider></v-divider>
@@ -299,13 +455,82 @@
           :prepend-icon="icon"
           :text="text"
           :to="route"
+           class="mb-2"
+           rounded="xl"
+          
+           block></v-btn>
+           
+           <v-btn
+          prepend-icon="mdi-newspaper-variant-outline"
+          text="Notification"
+          to="/admin/notification"
           class="mb-2"
            rounded="xl"
-          variant="tonal" 
-           block></v-btn>
-        </v-list-item>
+           block>
+           Notification
+           <v-badge
+            color="error"
+            floating
+            inline
+          > </v-badge>
+          </v-btn> 
        
-           
+
+           <v-btn
+          prepend-icon="mdi-inbox-arrow-down"
+          text="Inbox"
+          to="/admin/inbox"
+          class="mb-2"
+           rounded="xl"
+          
+           block>
+           <template v-slot:append>
+        <v-badge
+          color="error"
+          :content="count"
+          inline
+        ></v-badge>
+      </template>
+          </v-btn>
+
+        </v-list-item> 
+       
+          <!--
+        <v-list-item v-for="[icon, text, route] in links" :key="text">
+      <v-badge
+        v-if="text === 'Notification' || text === 'Inbox'"
+        color="red"
+        :content="2"
+              
+      >
+        <v-btn
+          :prepend-icon="icon"
+          :text="text"
+          :to="route"
+          class="mb-6"
+          rounded="xl"
+          variant="tonal"
+          block
+        >
+          
+        </v-btn>
+      </v-badge>
+
+      <v-btn
+        v-else
+        :prepend-icon="icon"
+        :text="text"
+        :to="route"
+        class="mb-2"
+        rounded="xl"
+        variant="tonal"
+        block
+      >
+       
+      </v-btn>
+    </v-list-item>
+        
+          -->  
         
      
         <div class="pa-4 text-end">
@@ -338,10 +563,10 @@
   const cards = ['Today', 'Yesterday']
   const links = [
     ['mdi-account-circle-outline', 'User' ,'/admin/user'],
-    ['mdi-account-circle-outline', 'Notification' ,'/admin/notification'],
+    
     ['mdi-send', 'New Message' , '/admin/send'],  
     ['mdi-account-circle-outline', 'Send' ,'/admin/envoyer'],
-    ['mdi-inbox-arrow-down', 'Inbox' ,'/admin/inbox'],
+    
     ['mdi-timeline-text-outline', 'History' ,'/admin/history'],
 // ['mdi-account-circle-outline', 'Boite' ,'/admin/boite'],
    
@@ -358,12 +583,29 @@
 
 <script>
    import axios from '../plugins/axios' 
+   import socket from '../plugins/socket';
   export default {
     data: () => ({
-      
+      UserConnectedService:null,
+      count:null,
+      userService:[],
+      isSuccess:false,
+      isFailed : false,
+      password: '',
+      nameRules: [
+        v => !!v || 'Password is required',
+        v => (v && v.length <= 10) || 'PAssword must be 8 characters or less',
+      ],
+      password2: '',
+      nameRules2: [
+        v => !!v || 'Confirmation Password is required',
+        v => (v && v.length <= 10) || 'Confirmation Password must be 8 characters or less',
+      ],
+
       previousRoute: '',
       drawer: null,
       dialog:false,
+      dialogPassword:false,
       dialogProfil: false,
       dialogEditProfil: false,
       UserConnected:[],
@@ -377,18 +619,105 @@
     }),
     created(){
       this.GetUserConnected();
+      this.UserConnected = localStorage.getItem("user-role");
+             if(this.UserConnected == "USER") {
+              this.$router.push({name:"userinbox"});
+             
+             }else{
+               if(!this.UserConnected){
+                  this.$router.push({name:"login"});  }
+             }
+     
+
     },
     mounted(){
-        
+
+      socket.on('new_message', (data) => {
+        this.count = Number(this.count) + 1 ;
+      }),
+
+      this.UserConnectedService = localStorage.getItem("user-info-service");
+      this.GetCount();
+      /*this.UserConnected = localStorage.getItem("user-role");
+             if(this.UserConnected == "USER") {
+              this.$router.push({name:"userinbox"});
+             
+             }else{
+               if(!this.UserConnected){
+                  this.$router.push({name:"login"});  }
+             }*/
        },
     methods: {
-     
+      async validate () {
+        const { valid } = await this.$refs.form.validate()
+
+        if (valid) {
+          if(this.password == this.password2){
+              try{
+                const response = await axios.post("/password/change", {
+          //current_password: this.currentPassword,
+                                    new_password: this.password,
+                                    confirm_password: this.password2,
+                                  })
+                                  .then((response) => {
+                                   
+                                  this.isSuccess=true;
+                                  this.dialogPassword = false;
+                                  console.log(response);
+                                  })
+                                  .catch((error) => {
+                      // Gérer l'erreur
+                                    if (error.response) {
+                                      console.error('Erreur lors de l\'envoi - Réponse du serveur :', error.response.data);
+                                      this.isFailed= true;
+                                      this.errorMessages =   error.response.data ;
+                                    } else {
+                                      console.error('Erreur lors de l\'envoi:', error.message);
+                                      this.isFailed = true;
+                                      this.errorMessages =   error.message;
+                                    }  });
+
+                                  
+                                
+                              
+              }catch(error){
+                console.log(response); 
+                this.reset;
+                                  this.dialogPassword = false;
+              }
+            
+          }else{
+            console.log('Mdp isnt valid')
+            this.isFailed= true;
+            this.errorMessages =   "Password not identical";
+          }
+        }
+      },
+      reset () {
+        this.$refs.form.reset()
+      },
+     async GetCount(){
+              try{
+                ;
+                const formData = new FormData();
+         formData.append("service",this.UserConnectedService);
+         
+         const response = await axios.post('/countmessage', formData);
+          this.count = response.data.length;       
+            console.log("messsages get" , this.count);
+            console.log("messsages service" , this.UserConnectedService);  
+              }catch(error){
+
+              }
+     },
       async GetUserConnected(){
           try{
               
                   const response = await axios.get('/userme');
                   console.log('Données recu avec succès', response.data);
-                   this.UserConnected = response.data;               
+                   this.UserConnected = response.data;    
+                    
+                   console.log(this.UserConnected);          
                    localStorage.setItem("user-info", this.UserConnected.name );  
                    localStorage.setItem("user-info-id", this.UserConnected.id ); 
 
@@ -396,6 +725,11 @@
                    this.serviceId = serviceIri.split('/').pop();
                   console.log('Service ID:', this.serviceId);
                    localStorage.setItem("user-info-service",  this.serviceId ); 
+
+                   const responseService = await axios.get(`/servicess/${this.serviceId}`);
+                  this.userService = responseService.data;
+                   console.log(this.userService);
+
                    if(this.UserConnected.roles[0] == 
                    "ROLE_ADMIN"){
                     this.UserRole = "ADMIN"
@@ -451,6 +785,9 @@ eventSource.onmessage = event => {
 }*/
 </script>
 <style >
+
+
+
 .slide-left-enter-active, .slide-left-leave-active {
   transition: transform 0.5s ease;
 }

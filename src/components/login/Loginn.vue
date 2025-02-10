@@ -1,12 +1,19 @@
 <template>
-    <div>
     
+    
+    <v-container fluid class="d-flex justify-center align-center" style="height: 100vh;background-image: url('/public/rm314-adj-10.jpg');">
+   
+      <!-- Section de droite avec le formulaire -->
+      <v-col cols="12" md="6">
+    <div>
+   
       <v-card
         class="mx-auto pa-12 pb-8"
         elevation="8"
         max-width="448"
         rounded="lg"
       >
+       <v-card-title class="d-flex justify-center text-h6 text-md-h5 text-lg-h4 font-weight-thin text-blue "> LOG IN</v-card-title>
         <div class="text-subtitle-1 text-medium-emphasis">Account</div>
   
         <v-text-field
@@ -20,13 +27,13 @@
         <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
           Password
   
-          <a
+       <!-- <a
             class="text-caption text-decoration-none text-blue"
             href="#"
             rel="noopener noreferrer"
             target="_blank"
           >
-            Forgot login password?</a>
+            Forgot login password?</a>-->  
         </div>
   
         <v-text-field
@@ -74,6 +81,9 @@
         </v-card-text>
       </v-card>
     </div>
+  </v-col>
+
+</v-container>
   </template>
   <script>
   import axios from '../../plugins/axios' 
@@ -85,8 +95,20 @@
           password:null
         },
         errorMessages:"",
-        user: []
+        user: [],
+        UserConnected:null,
       }),
+      mounted(){
+        this.UserConnected = localStorage.getItem("user-role");
+             if(this.UserConnected == "ADMIN") {
+              this.$router.push({name:"admininbox"});
+             
+             }else{
+               if(this.UserConnected == "USER"){
+                  this.$router.push({name:"userinbox"});  }
+             }
+             
+      },
       
       
       methods:{
@@ -100,9 +122,11 @@
                   this.user = response.data;
                           console.log(this.user);
                           if(this.user.roles[0] == "ROLE_ADMIN"){
-                            this.$router.push({name:"admininbox"})
+                            this.$router.push({name:"adminuser"})
+                            localStorage.setItem("user-role", "ADMIN")
                           }else{
-                            this.$router.push({name:"userinbox"})
+                            this.$router.push({name:"useruser"})
+                           localStorage.setItem("user-role", "USER")
                           }
                          
                         console.log('Success:', response.data)
